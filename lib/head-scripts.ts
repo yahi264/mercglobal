@@ -5,10 +5,11 @@ export const themeScript = `(function(){try{var t=localStorage.getItem("merc-the
 
 // Runs in <head> before the page is drawn: decides whether to play the intro.
 export const introScript = `(function(){try{var d=document.documentElement;
-if(sessionStorage.getItem("merc-intro")||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+var fix=/introAt=/.test(location.search);
+if(!fix&&sessionStorage.getItem("merc-intro")||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
 sessionStorage.setItem("merc-intro","1");d.classList.add("intro");
 var end=function(){d.classList.remove("intro");d.classList.remove("intro-skip")};
-var t=setTimeout(end,4300);
+var t=fix?0:setTimeout(end,6600);
 var skip=function(){if(!d.classList.contains("intro"))return;clearTimeout(t);d.classList.add("intro-skip");setTimeout(end,500);
 removeEventListener("pointerdown",skip);removeEventListener("keydown",skip)};
 setTimeout(function(){addEventListener("pointerdown",skip);addEventListener("keydown",skip)},300);

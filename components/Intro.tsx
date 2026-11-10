@@ -1,9 +1,15 @@
-// First-visit opening animation: the Merç "M" mark draws itself line by line, the name rises in,
-// a red progress line runs, then a double curtain (navy, then red) lifts to reveal the page.
-// It is pure CSS (see globals.css, "Intro"), so it starts instantly — before any JavaScript loads —
-// and plays once per browser session. Visitors who prefer reduced motion never see it.
-// Click / tap / any key skips it.
+import { asset } from "@/lib/asset";
 
+// First-visit opening sequence (about 5 seconds, skippable, once per browser session):
+//  1. A 3D dotted globe turns to face Türkiye.
+//  2. Red workforce routes fly in from the four sourcing regions (Turkic/CIS, Africa, Asia, Europe & Balkans)
+//     to the Ankara head office, which pulses with each arrival; then routes leave Ankara for project
+//     countries taken from the company's reference list (Saudi Arabia, Qatar, UAE, Iraq, Kuwait, Oman, Libya…).
+//  3. The camera dives into Ankara, the Merç "M" mark draws itself, the name rises in.
+//  4. A red ring opens from the centre and reveals the website.
+// The globe is drawn on a <canvas> by public/intro-globe.js (built by scripts/make-land-dots.mjs);
+// everything else is CSS (globals.css, "Intro"). Visitors who prefer reduced motion never see it.
+// For checking a single moment, add ?introAt=2.1 (seconds) to the address: the globe stops at that time.
 
 // Two arches made of three parallel lines, joined in the middle with a small ring — the Merç mark.
 const lines = [
@@ -14,15 +20,16 @@ const lines = [
   "M74 96 V46 A11 11 0 0 1 96 46 V96",
 ];
 
-export function Intro({ tagline }: { tagline: string }) {
+export function Intro({ tagline, skip }: { tagline: string; skip: string }) {
   const name = "MERÇ GLOBAL";
   return (
     <div id="intro" aria-hidden="true">
-      <div className="intro-red" />
       <div className="intro-panel">
         <div className="intro-glow" />
         <div className="intro-grid" />
-        <div className="relative flex flex-col items-center px-6 text-center">
+        <canvas id="intro-canvas" className="intro-canvas" suppressHydrationWarning />
+        <script src={asset("/intro-globe.js")} async />
+        <div className="intro-brand relative flex flex-col items-center px-6 text-center">
           <svg viewBox="0 0 120 104" className="intro-mark h-24 w-28 sm:h-28 sm:w-32" fill="none">
             {lines.map((d, i) => (
               <path key={d} d={d} pathLength={1} className="intro-path" style={{ "--i": i } as React.CSSProperties} />
@@ -41,7 +48,9 @@ export function Intro({ tagline }: { tagline: string }) {
             <span className="block h-full w-full bg-brand" />
           </div>
         </div>
+        <span className="intro-skip-hint absolute bottom-6 end-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/45">{skip}</span>
       </div>
+      <div className="intro-ring" />
     </div>
   );
 }

@@ -21,8 +21,11 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "d3-geo": "^3.1.1",
     "sharp": "0.35.5",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2"
+    "topojson-client": "^3.1.0",
+    "typescript": "7.0.2",
+    "world-atlas": "^2.0.2"
   }
 }

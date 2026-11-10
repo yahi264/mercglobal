@@ -121,8 +121,14 @@ html[dir="rtl"] .flip-rtl {
   }
 }
 
-/* ─── Intro (first visit) — timeline in ms: mark draws 150–1700, name 700–1800,
-   bar 400–2100, content out 2050, navy curtain 2250–3150, red curtain 2400–3300 ─── */
+/* ─── Intro (first visit). Timeline (ms):
+   globe + routes 0–2600 · dive into Ankara 2350–3400 · mark draws 2700–4000 · name 3050–4100
+   bar 2700–4300 · brand out 4350 · red ring opens the page 4450–5450 ─── */
+@property --hole {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
 #intro {
   display: none;
 }
@@ -131,7 +137,7 @@ html.intro #intro {
   position: fixed;
   inset: 0;
   z-index: 100;
-  animation: introGone 0s linear 3400ms forwards;
+  animation: introGone 0s linear 5500ms forwards;
 }
 html.intro body {
   overflow: hidden;
@@ -140,45 +146,60 @@ html.intro-skip #intro {
   opacity: 0;
   transition: opacity 0.45s ease;
 }
-.intro-panel,
-.intro-red {
+.intro-panel {
   position: absolute;
   inset: 0;
-  will-change: transform;
-}
-.intro-red {
-  background: linear-gradient(135deg, #e3141e, #8f0a10);
-  animation: curtainUp 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2400ms forwards;
-}
-.intro-panel {
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #07111f;
-  animation: curtainUp 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2250ms forwards;
+  background: radial-gradient(ellipse at 50% 40%, #0d1f38 0%, #07111f 55%, #040a14 100%);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  animation: holeOpen 1s cubic-bezier(0.7, 0, 0.2, 1) 4450ms forwards;
+}
+.intro-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.intro-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  border: 3px solid #e3141e;
+  box-shadow: 0 0 40px 6px rgba(227, 20, 30, 0.55), inset 0 0 30px rgba(227, 20, 30, 0.4);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  animation: ringOpen 1s cubic-bezier(0.7, 0, 0.2, 1) 4450ms forwards;
 }
 .intro-glow {
   position: absolute;
   inset: -20%;
-  background: radial-gradient(circle at 50% 45%, rgba(227, 20, 30, 0.28), transparent 42%),
-    radial-gradient(circle at 15% 85%, rgba(30, 58, 95, 0.7), transparent 50%);
-  animation: glowPulse 2.4s ease-in-out both;
+  background: radial-gradient(circle at 50% 48%, rgba(227, 20, 30, 0.22), transparent 40%),
+    radial-gradient(circle at 12% 88%, rgba(30, 58, 95, 0.6), transparent 50%);
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2400ms forwards;
 }
 .intro-grid {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 56px 56px;
-  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 65%);
-  animation: gridIn 1.6s ease-out both;
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
+  animation: gridIn 2s ease-out both;
 }
-.intro-panel > .relative {
-  animation: contentOut 0.5s cubic-bezier(0.55, 0, 0.45, 1) 2050ms forwards;
+.intro-brand {
+  animation: contentOut 0.45s cubic-bezier(0.55, 0, 0.45, 1) 4350ms forwards;
 }
 .intro-mark {
-  filter: drop-shadow(0 0 18px rgba(227, 20, 30, 0.45));
+  filter: drop-shadow(0 0 22px rgba(227, 20, 30, 0.6));
 }
 .intro-path {
   stroke: #e3141e;
@@ -187,13 +208,16 @@ html.intro-skip #intro {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: drawLine 0.95s cubic-bezier(0.65, 0, 0.35, 1) both;
-  animation-delay: calc(150ms + var(--i) * 110ms);
+  animation-delay: calc(2700ms + var(--i) * 100ms);
 }
 .intro-dot {
   fill: #e3141e;
   fill-opacity: 0;
-  animation: drawLine 0.6s ease both, dotFill 0.4s ease forwards;
-  animation-delay: 750ms, 1250ms;
+  animation: drawLine 0.5s ease both, dotFill 0.4s ease forwards;
+  animation-delay: 3150ms, 3550ms;
+}
+.intro-name {
+  perspective: 600px;
 }
 .intro-letter {
   display: inline-block;
@@ -201,26 +225,35 @@ html.intro-skip #intro {
   transform: translateY(0.7em) rotateX(-70deg);
   filter: blur(6px);
   animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: calc(700ms + var(--i) * 45ms);
+  animation-delay: calc(3050ms + var(--i) * 45ms);
 }
 .intro-tag {
   opacity: 0;
-  animation: fadeUp 0.8s ease forwards 1250ms;
+  animation: fadeUp 0.8s ease forwards 3500ms;
 }
 .intro-bar span {
   transform: scaleX(0);
   transform-origin: left;
-  animation: barFill 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards 400ms;
+  animation: barFill 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards 2700ms;
+}
+.intro-skip-hint {
+  opacity: 0;
+  animation: fadeIn 0.6s ease 900ms forwards, contentOut 0.3s ease 4300ms forwards;
 }
 
 @keyframes drawLine { 0% { stroke-dashoffset: 1; opacity: 0; } 8% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
 @keyframes dotFill { to { fill-opacity: 1; } }
 @keyframes letterIn { to { opacity: 1; transform: none; filter: blur(0); } }
 @keyframes barFill { to { transform: scaleX(1); } }
-@keyframes contentOut { to { opacity: 0; transform: translateY(-24px) scale(0.96); filter: blur(4px); } }
-@keyframes curtainUp { to { transform: translateY(-101%); } }
+@keyframes contentOut { to { opacity: 0; transform: translateY(-20px) scale(0.94); filter: blur(4px); } }
+@keyframes holeOpen { to { --hole: 150vmax; } }
+@keyframes ringOpen {
+  0% { width: 0; height: 0; opacity: 1; }
+  80% { opacity: 1; }
+  100% { width: 300vmax; height: 300vmax; opacity: 0; }
+}
 @keyframes introGone { to { visibility: hidden; pointer-events: none; } }
-@keyframes glowPulse { 0% { opacity: 0; transform: scale(0.8); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1.05); } }
+@keyframes fadeIn { to { opacity: 1; } }
 @keyframes gridIn { from { opacity: 0; transform: scale(1.15); } to { opacity: 1; transform: none; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
@@ -229,7 +262,7 @@ html.intro-skip #intro {
   --base: 120ms;
 }
 html.intro .hero-text {
-  --base: 2700ms;
+  --base: 4800ms;
 }
 html.intro-skip .hero-text {
   --base: 350ms;
@@ -260,7 +293,7 @@ html.intro-skip .hero-text {
 
 /* The first photo zooms out slowly as the curtain lifts */
 html.intro .hero-pic img {
-  animation: heroZoom 3s cubic-bezier(0.22, 1, 0.36, 1) 2250ms both;
+  animation: heroZoom 3s cubic-bezier(0.22, 1, 0.36, 1) 4450ms both;
 }
 @keyframes heroZoom { from { transform: scale(1.22); } to { transform: scale(1); } }
 .intro-name {

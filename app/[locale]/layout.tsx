@@ -54,7 +54,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: themeScript + introScript }} />
       </head>
       <body>
-        <Intro tagline={text.heroEyebrow[l]} />
+        <Intro tagline={text.heroEyebrow[l]} skip={t("skipIntro")} />
         <SmoothScroll />
         <ScrollProgress />
         <Header
