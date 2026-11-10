@@ -21,11 +21,17 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
   const [paused, setPaused] = useState(false);
   const go = useCallback((n: number) => setI((n + slides.length) % slides.length), [slides.length]);
 
+  // The first slide waits for the opening animation (if it is playing) before moving on.
+  const [changed, setChanged] = useState(false);
   useEffect(() => {
     if (paused) return;
-    const id = setTimeout(() => go(i + 1), 6500);
+    const intro = !changed && document.documentElement.classList.contains("intro");
+    const id = setTimeout(() => go(i + 1), intro ? 11000 : 6500);
     return () => clearTimeout(id);
-  }, [i, paused, go]);
+  }, [i, paused, go, changed]);
+  useEffect(() => {
+    if (i !== 0) setChanged(true);
+  }, [i]);
 
   // Preload the next photo so the change is seamless
   useEffect(() => {
@@ -72,7 +78,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
 
       <div className="container-x pb-24 pt-16 md:pb-28">
         {/* Text is revealed word by word with CSS (see globals.css), so it also plays right after the intro */}
-        <div key={i} className="hero-text max-w-2xl text-white">
+        <div key={i} className={`hero-text max-w-2xl text-white ${changed ? "" : "hero-first"}`}>
           <p className="hero-fade mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur" style={{ "--i": 0 } as React.CSSProperties}>
             <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {eyebrow}
           </p>
