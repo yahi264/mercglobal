@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Rotate3d } from "lucide-react";
+import { HeroGlobe } from "./HeroGlobe";
 import { asset } from "@/lib/asset";
 
 export type Slide = { image: number; title: string; text: string; href: string };
@@ -12,11 +13,12 @@ type Props = {
   slides: Slide[];
   eyebrow: string;
   ctaHref: string;
-  labels: { request: string; details: string; prev: string; next: string };
+  labels: { request: string; details: string; prev: string; next: string; drag: string };
+  badges: { value: string; label: string }[];
 };
 
 // Full-width rotating hero with the nine sector photos from the original site.
-export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
+export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const go = useCallback((n: number) => setI((n + slides.length) % slides.length), [slides.length]);
@@ -76,9 +78,38 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-navy via-navy/60 to-navy/10" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy/80 via-navy/30 to-transparent rtl:bg-gradient-to-l" />
 
-      <div className="container-x pb-24 pt-16 md:pb-28">
+      {/* Live globe: workforce routes into Ankara (right side on desktop, top on phones) */}
+      <div
+        className="hero-globe pointer-events-none absolute left-0 right-0 top-4 z-0 mx-auto aspect-square w-[72vw] max-w-[400px] sm:top-6 sm:w-[60vw] lg:left-auto lg:right-[-3%] lg:top-1/2 lg:mx-0 lg:w-[min(44vw,80svh)] lg:max-w-none lg:-translate-y-1/2 xl:w-[min(52vw,86svh,760px)] rtl:lg:left-[-3%] rtl:lg:right-auto [@media(max-height:700px)_and_(max-width:1023px)]:hidden"
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
+        <div className="absolute inset-[-12%] rounded-full bg-[radial-gradient(circle,rgba(7,17,31,0.8)_0%,rgba(7,17,31,0.45)_45%,transparent_70%)]" />
+        <HeroGlobe className="pointer-events-auto relative h-full w-full" />
+        <div className="hidden xl:block">
+          {badges.map((b, n) => (
+            <div
+              key={n}
+              className={`hero-badge absolute max-w-[200px] rounded-2xl border border-white/15 bg-navy/55 px-4 py-3 text-white shadow-2xl shadow-black/30 backdrop-blur-md ${
+                ["start-[4%] top-[12%]", "start-[-1%] bottom-[22%]", "end-[14%] bottom-[17%]"][n]
+              }`}
+              style={{ "--i": n } as React.CSSProperties}
+            >
+              <p className="text-2xl font-extrabold leading-none text-brand" dir="ltr">
+                {b.value}
+              </p>
+              <p className="mt-1.5 text-xs font-semibold leading-snug text-white/80">{b.label}</p>
+            </div>
+          ))}
+          <p className="hero-badge absolute bottom-[1%] left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-white/45" style={{ "--i": 3 } as React.CSSProperties}>
+            <Rotate3d className="h-3.5 w-3.5" /> {labels.drag}
+          </p>
+        </div>
+      </div>
+
+      <div className="container-x relative z-10 pb-24 pt-16 md:pb-28">
         {/* Text is revealed word by word with CSS (see globals.css), so it also plays right after the intro */}
-        <div key={i} className={`hero-text max-w-2xl text-white ${changed ? "" : "hero-first"}`}>
+        <div key={i} className={`hero-text max-w-2xl text-white lg:max-w-[540px] xl:max-w-[600px] ${changed ? "" : "hero-first"}`}>
           <p className="hero-fade mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur" style={{ "--i": 0 } as React.CSSProperties}>
             <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {eyebrow}
           </p>
@@ -109,7 +140,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
       </div>
 
       {/* Controls */}
-      <div className="absolute inset-x-0 bottom-6 md:bottom-8">
+      <div className="absolute inset-x-0 bottom-6 z-10 md:bottom-8">
         <div className="container-x flex items-center justify-between gap-4">
           <div className="flex flex-wrap gap-1.5 pe-20 sm:pe-0" role="tablist">
             {slides.map((sl, n) => (
@@ -135,7 +166,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
           </div>
         </div>
       </div>
-      <span className="absolute end-4 top-6 hidden font-mono text-sm text-white/60 md:block" aria-hidden dir="ltr">
+      <span className="absolute end-4 top-6 z-10 hidden font-mono text-sm text-white/60 md:block" aria-hidden dir="ltr">
         {String(i + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
       </span>
     </section>

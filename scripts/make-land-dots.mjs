@@ -1,4 +1,4 @@
-// Builds public/intro-globe.js (the intro globe) from scripts/intro-globe.template.js, filling in
+// Builds public/intro-globe.js (the intro globe) and public/land-dots.json (the hero globe) from scripts/intro-globe.template.js, filling in
 // evenly spread points that fall on land (world-atlas data). Run after editing the template:
 //   node scripts/make-land-dots.mjs
 import { readFileSync, writeFileSync } from "node:fs";
@@ -19,4 +19,5 @@ for (let i = 0; i < N; i++) {
 }
 const tpl = readFileSync("scripts/intro-globe.template.js", "utf8");
 writeFileSync("public/intro-globe.js", tpl.replace("__LAND__", JSON.stringify(out)));
+writeFileSync("public/land-dots.json", JSON.stringify(out)); // used by the live hero globe
 console.log(`${out.length / 2} land dots, ${JSON.stringify(out).length} bytes`);

@@ -299,3 +299,32 @@ html.intro .hero-pic img {
 .intro-name {
   perspective: 600px;
 }
+
+/* ─── Live hero globe and its fact badges ─── */
+.hero-globe {
+  --gb: 300ms;
+  animation: globeIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--gb);
+}
+html.intro .hero-globe {
+  --gb: 4500ms;
+}
+html.intro-skip .hero-globe {
+  --gb: 300ms;
+}
+.hero-badge {
+  animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both, floaty 6s ease-in-out infinite;
+  animation-delay: calc(var(--gb) + 700ms + var(--i) * 160ms), calc(var(--gb) + 1700ms + var(--i) * 900ms);
+}
+p.hero-badge {
+  animation-name: fadeIn, none;
+  opacity: 0;
+}
+@keyframes globeIn {
+  from { opacity: 0; scale: 0.82; filter: blur(8px); }
+  to { opacity: 1; scale: 1; filter: none; }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

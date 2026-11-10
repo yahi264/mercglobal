@@ -21,7 +21,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         slides={sectors.map((s) => ({ image: s.image, title: s.title[l], text: s.text[l], href: href(l, `sectors/${s.slug}`) }))}
         eyebrow={t("navSectors")}
         ctaHref={href(l, "contact") + "#request"}
-        labels={{ request: t("requestStaff"), details: t("learnMore"), prev: t("prev"), next: t("next") }}
+        labels={{ request: t("requestStaff"), details: t("learnMore"), prev: t("prev"), next: t("next"), drag: t("dragGlobe") }}
+        badges={[
+          { value: String(regions.length), label: text.stat3[l] },
+          { value: String(sectors.length), label: text.stat2[l] },
+          { value: "No. 494", label: text.licenceShort[l] },
+        ]}
       />
 
       {/* Stats */}

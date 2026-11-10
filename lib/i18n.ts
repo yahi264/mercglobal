@@ -34,6 +34,7 @@ const dict = {
   language: { en: "Language", tr: "Dil", ar: "اللغة", fr: "Langue", ru: "Язык" },
   darkMode: { en: "Dark mode", tr: "Koyu mod", ar: "الوضع الداكن", fr: "Mode sombre", ru: "Тёмная тема" },
   lightMode: { en: "Light mode", tr: "Açık mod", ar: "الوضع الفاتح", fr: "Mode clair", ru: "Светлая тема" },
+  dragGlobe: { en: "Drag to rotate", tr: "Döndürmek için sürükleyin", ar: "اسحب للتدوير", fr: "Faites glisser pour tourner", ru: "Потяните, чтобы вращать" },
   skipIntro: { en: "Skip", tr: "Geç", ar: "تخطٍّ", fr: "Passer", ru: "Пропустить" },
   backToTop: { en: "Back to top", tr: "Yukarı çık", ar: "العودة إلى الأعلى", fr: "Retour en haut", ru: "Наверх" },
   phone: { en: "Phone", tr: "Telefon", ar: "الهاتف", fr: "Téléphone", ru: "Телефон" },
