@@ -6,7 +6,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingContact } from "@/components/FloatingContact";
 import { BackToTop, PageFade, ScrollProgress, SmoothScroll } from "@/components/Motion";
-import { themeScript } from "@/components/ThemeToggle";
+import { Intro } from "@/components/Intro";
+import { introScript, themeScript } from "@/lib/head-scripts";
 import { company, mainWhatsApp, text } from "@/lib/content";
 import { dirOf, getT, isLocale, locales, type Locale } from "@/lib/i18n";
 import { href, navItems } from "@/lib/nav";
@@ -50,9 +51,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={l} dir={dirOf(l)} className={`${manrope.variable} ${cairo.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript + introScript }} />
       </head>
       <body>
+        <Intro tagline={text.heroEyebrow[l]} />
         <SmoothScroll />
         <ScrollProgress />
         <Header

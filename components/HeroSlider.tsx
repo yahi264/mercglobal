@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { asset } from "@/lib/asset";
@@ -56,7 +56,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
       <AnimatePresence initial={false}>
         <motion.picture
           key={s.image}
-          className="absolute inset-0 -z-20"
+          className="hero-pic absolute inset-0 -z-20"
           initial={{ opacity: 0, scale: 1.08 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
@@ -71,30 +71,35 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels }: Props) {
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy/80 via-navy/30 to-transparent rtl:bg-gradient-to-l" />
 
       <div className="container-x pb-24 pt-16 md:pb-28">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-2xl text-white"
-          >
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {eyebrow}
-            </p>
-            <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">{s.title}</h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">{s.text}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={ctaHref} className="btn-brand">
-                {labels.request} <ArrowRight className="flip-rtl h-4 w-4" />
-              </Link>
-              <Link href={s.href} className="btn-ghost">
-                {labels.details}
-              </Link>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+        {/* Text is revealed word by word with CSS (see globals.css), so it also plays right after the intro */}
+        <div key={i} className="hero-text max-w-2xl text-white">
+          <p className="hero-fade mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur" style={{ "--i": 0 } as React.CSSProperties}>
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {eyebrow}
+          </p>
+          <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl" aria-label={s.title}>
+            {s.title.split(" ").map((w, n) => (
+              <Fragment key={n}>
+                <span className="word-mask" aria-hidden>
+                  <span className="word" style={{ "--i": n + 1 } as React.CSSProperties}>
+                    {w}
+                  </span>
+                </span>{" "}
+              </Fragment>
+            ))}
+          </h1>
+          <p className="hero-fade mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg" style={{ "--i": 4 } as React.CSSProperties}>
+            {s.text}
+          </p>
+          <div className="hero-fade mt-8 flex flex-wrap gap-3" style={{ "--i": 6 } as React.CSSProperties}>
+            <Link href={ctaHref} className="btn-brand">
+              {labels.request} <ArrowRight className="flip-rtl h-4 w-4" />
+            </Link>
+            <Link href={s.href} className="btn-ghost">
+              {labels.details}
+            </Link>
+          </div>
+          <span className="hero-line mt-10 hidden h-px sm:block w-40 origin-left bg-gradient-to-r from-brand to-transparent rtl:origin-right rtl:bg-gradient-to-l" aria-hidden />
+        </div>
       </div>
 
       {/* Controls */}

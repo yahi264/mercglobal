@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
-// Runs before the page is shown (see layout) so the saved mode never flashes.
-export const themeScript = `(function(){try{var t=localStorage.getItem("merc-theme");if(!t){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}})();`;
 
 export function ThemeToggle({ darkLabel, lightLabel }: { darkLabel: string; lightLabel: string }) {
   const [dark, setDark] = useState(false);

@@ -120,3 +120,149 @@ html[dir="rtl"] .flip-rtl {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─── Intro (first visit) — timeline in ms: mark draws 150–1700, name 700–1800,
+   bar 400–2100, content out 2050, navy curtain 2250–3150, red curtain 2400–3300 ─── */
+#intro {
+  display: none;
+}
+html.intro #intro {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  animation: introGone 0s linear 3400ms forwards;
+}
+html.intro body {
+  overflow: hidden;
+}
+html.intro-skip #intro {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.intro-panel,
+.intro-red {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.intro-red {
+  background: linear-gradient(135deg, #e3141e, #8f0a10);
+  animation: curtainUp 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2400ms forwards;
+}
+.intro-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #07111f;
+  animation: curtainUp 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2250ms forwards;
+}
+.intro-glow {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle at 50% 45%, rgba(227, 20, 30, 0.28), transparent 42%),
+    radial-gradient(circle at 15% 85%, rgba(30, 58, 95, 0.7), transparent 50%);
+  animation: glowPulse 2.4s ease-in-out both;
+}
+.intro-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 65%);
+  animation: gridIn 1.6s ease-out both;
+}
+.intro-panel > .relative {
+  animation: contentOut 0.5s cubic-bezier(0.55, 0, 0.45, 1) 2050ms forwards;
+}
+.intro-mark {
+  filter: drop-shadow(0 0 18px rgba(227, 20, 30, 0.45));
+}
+.intro-path {
+  stroke: #e3141e;
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawLine 0.95s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: calc(150ms + var(--i) * 110ms);
+}
+.intro-dot {
+  fill: #e3141e;
+  fill-opacity: 0;
+  animation: drawLine 0.6s ease both, dotFill 0.4s ease forwards;
+  animation-delay: 750ms, 1250ms;
+}
+.intro-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.7em) rotateX(-70deg);
+  filter: blur(6px);
+  animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(700ms + var(--i) * 45ms);
+}
+.intro-tag {
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 1250ms;
+}
+.intro-bar span {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: barFill 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards 400ms;
+}
+
+@keyframes drawLine { 0% { stroke-dashoffset: 1; opacity: 0; } 8% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes dotFill { to { fill-opacity: 1; } }
+@keyframes letterIn { to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes barFill { to { transform: scaleX(1); } }
+@keyframes contentOut { to { opacity: 0; transform: translateY(-24px) scale(0.96); filter: blur(4px); } }
+@keyframes curtainUp { to { transform: translateY(-101%); } }
+@keyframes introGone { to { visibility: hidden; pointer-events: none; } }
+@keyframes glowPulse { 0% { opacity: 0; transform: scale(0.8); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1.05); } }
+@keyframes gridIn { from { opacity: 0; transform: scale(1.15); } to { opacity: 1; transform: none; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* ─── Hero text: words rise out of a mask, one after another ─── */
+.hero-text {
+  --base: 120ms;
+}
+html.intro .hero-text {
+  --base: 2700ms;
+}
+html.intro-skip .hero-text {
+  --base: 350ms;
+}
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.word {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: wordUp 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--base) + var(--i) * 75ms);
+}
+.hero-fade {
+  animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--base) + var(--i) * 75ms);
+}
+.hero-line {
+  transform: scaleX(0);
+  animation: barFill 1.2s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: calc(var(--base) + 700ms);
+}
+@keyframes wordUp { to { transform: none; } }
+
+/* The first photo zooms out slowly as the curtain lifts */
+html.intro .hero-pic img {
+  animation: heroZoom 3s cubic-bezier(0.22, 1, 0.36, 1) 2250ms both;
+}
+@keyframes heroZoom { from { transform: scale(1.22); } to { transform: scale(1); } }
+.intro-name {
+  perspective: 600px;
+}
