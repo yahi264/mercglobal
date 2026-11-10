@@ -65,7 +65,7 @@ export default async function SectorPage({ params }: P) {
         </Reveal>
         <Reveal delay={0.1}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset(`/img/slide/${s.image}.webp`)} alt={s.title[l]} className="aspect-[4/3] w-full rounded-3xl object-cover shadow-2xl shadow-navy/20" />
+          <img src={asset(`/img/slide/${s.image}.webp`)} alt={s.title[l]} loading="lazy" className="aspect-[4/3] w-full rounded-3xl object-cover shadow-2xl shadow-navy/20" />
         </Reveal>
       </section>
       <section className="bg-page-2 py-20">

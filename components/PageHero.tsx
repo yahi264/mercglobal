@@ -21,8 +21,8 @@ export function PageHero({
     <section className="relative isolate overflow-hidden bg-navy text-white">
       {image && (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset(image)} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover" />
+          {/* Background photo as CSS, so pages fetched in advance don't download it before they are opened */}
+          <div className="absolute inset-0 -z-20 bg-cover bg-center" style={{ backgroundImage: `url(${asset(image)})` }} aria-hidden />
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/85 to-navy/40 rtl:bg-gradient-to-l" />
         </>
       )}
