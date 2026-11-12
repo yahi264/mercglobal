@@ -2,6 +2,22 @@
   "updated": "2026-11-12",
   "jobs": [
     {
+      "id": "do090ujy",
+      "title": "Engineer",
+      "country": "Qatar",
+      "city": "Dowha",
+      "sector": "oil-gas",
+      "type": "2 years",
+      "positions": "10",
+      "salary": "1,500 USD ",
+      "description": "Something",
+      "requirements": "min. 5 years experience",
+      "deadline": "2026-11-20",
+      "posted": "2026-11-12",
+      "language": "en",
+      "active": true
+    },
+    {
       "id": "6x1ozo33",
       "title": "WELDER",
       "country": "MALTA",
