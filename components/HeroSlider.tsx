@@ -107,9 +107,9 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) 
         </div>
       </div>
 
-      <div className="container-x relative z-10 pb-24 pt-16 md:pb-28">
+      <div className="container-x pointer-events-none relative z-10 pb-24 pt-16 md:pb-28">
         {/* Text is revealed word by word with CSS (see globals.css), so it also plays right after the intro */}
-        <div key={i} className={`hero-text max-w-2xl text-white lg:max-w-[540px] xl:max-w-[600px] ${changed ? "" : "hero-first"}`}>
+        <div key={i} className={`hero-text pointer-events-auto max-w-2xl text-white lg:max-w-[540px] xl:max-w-[600px] ${changed ? "" : "hero-first"}`}>
           <p className="hero-fade mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur" style={{ "--i": 0 } as React.CSSProperties}>
             <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {eyebrow}
           </p>
@@ -140,8 +140,8 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) 
       </div>
 
       {/* Controls */}
-      <div className="absolute inset-x-0 bottom-6 z-10 md:bottom-8">
-        <div className="container-x flex items-center justify-between gap-4">
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 md:bottom-8">
+        <div className="container-x flex items-center justify-between gap-4 [&>*]:pointer-events-auto">
           <div className="flex flex-wrap gap-1.5 pe-20 sm:pe-0" role="tablist">
             {slides.map((sl, n) => (
               <button

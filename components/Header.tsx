@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
@@ -27,6 +27,40 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sub, setSub] = useState<string | null>(null);
+
+  // The full menu is shown only when it really fits next to the logo and buttons (labels differ per
+  // language, and browsers may auto-translate them). Otherwise the compact ☰ menu is used.
+  const rowRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState<boolean | null>(null);
+  useEffect(() => {
+    const row = rowRef.current, logo = logoRef.current, actions = actionsRef.current, measure = measureRef.current;
+    if (!row || !logo || !actions || !measure) return;
+    let timer = 0;
+    const check = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (window.innerWidth < 1280) return setCompact(true);
+        const cs = getComputedStyle(row);
+        const inner = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const free = inner - logo.scrollWidth - actions.offsetWidth - 40;
+        setCompact(measure.scrollWidth > free);
+      }, 60);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(row);
+    const mo = new MutationObserver(check); // e.g. the browser translating the page
+    mo.observe(row, { subtree: true, characterData: true, childList: true });
+    document.fonts?.ready.then(check);
+    return () => { ro.disconnect(); mo.disconnect(); window.clearTimeout(timer); };
+  }, []);
+  const navShow = compact === null ? "hidden xl:flex" : compact ? "hidden" : "flex";
+  const burgerShow = compact === null ? "flex xl:hidden" : compact ? "flex" : "hidden";
+  // "Request Staff" button beside the ☰ menu on tablets/laptops; with the full menu it lives under "Contact"
+  const ctaShow = compact === null ? "hidden lg:inline-flex xl:hidden" : compact ? "hidden lg:inline-flex" : "hidden";
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 24);
@@ -91,19 +125,28 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
           scrolled ? "border-line bg-card/85 shadow-lg shadow-navy/5 backdrop-blur-xl" : "border-transparent bg-card"
         }`}
       >
-        <div className="container-x flex h-[72px] items-center justify-between gap-2 sm:gap-4">
-          <Link href={`/${locale}/`} className="flex min-w-0 shrink items-center" aria-label={`Merç Global — ${labels.home}`}>
-            <Logo className="[--lh:27px] min-[400px]:[--lh:30px] sm:[--lh:38px] lg:[--lh:40px]" />
+        <div ref={rowRef} className="container-x relative flex h-[72px] items-center justify-between gap-2 sm:gap-4">
+          {/* invisible copy of the menu, used only to measure how wide it is */}
+          <div ref={measureRef} aria-hidden className="pointer-events-none invisible absolute start-0 top-0 -z-10 flex h-0 overflow-hidden whitespace-nowrap">
+            {items.map((it) => (
+              <span key={it.href} className="flex items-center gap-1 px-2.5 text-[13.5px] font-semibold">
+                {it.label}
+                {it.children && <span className="inline-block w-3.5" />}
+              </span>
+            ))}
+          </div>
+          <Link ref={logoRef} href={`/${locale}/`} className="flex min-w-0 shrink items-center overflow-hidden" aria-label={`Merç Global — ${labels.home}`}>
+            <Logo className="[--lh:min(30px,calc((100vw_-_182px)/7.4))] sm:[--lh:38px] lg:[--lh:40px]" />
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden items-center xl:flex 2xl:gap-1">
+          <nav className={`${navShow} min-w-0 items-center`}>
             {items.map((it) =>
               it.children ? (
                 <div key={it.href} className="group relative">
                   <Link
                     href={it.href}
-                    className={`flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold 2xl:px-3.5 2xl:text-[14px] transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
+                    className={`flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
                   >
                     {it.label}
                     <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
@@ -127,7 +170,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 <Link
                   key={it.href}
                   href={it.href}
-                  className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold 2xl:px-3.5 2xl:text-[14px] transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
+                  className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
                 >
                   {it.label}
                 </Link>
@@ -135,16 +178,16 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
             )}
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div ref={actionsRef} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher locale={locale} label={labels.language} />
             <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
-            <Link href={cta.href} className="btn-brand hidden whitespace-nowrap !px-5 !py-2.5 lg:inline-flex xl:hidden 2xl:inline-flex">
+            <Link href={cta.href} className={`btn-brand ${ctaShow} whitespace-nowrap !px-5 !py-2.5`}>
               {cta.label}
             </Link>
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-fg xl:hidden"
+              className={`${burgerShow} h-10 w-10 items-center justify-center rounded-full border border-line text-fg`}
               aria-label={labels.menuOpen}
               aria-expanded={open}
             >
@@ -159,14 +202,14 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
         {open && (
           <>
             <motion.div
-              className="fixed inset-0 z-[70] bg-navy/60 backdrop-blur-sm xl:hidden"
+              className="fixed inset-0 z-[70] bg-navy/60 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setOpen(false)}
             />
             <motion.aside
-              className="fixed inset-y-0 end-0 z-[80] flex w-[88%] max-w-sm flex-col bg-card text-fg shadow-2xl xl:hidden"
+              className="fixed inset-y-0 end-0 z-[80] flex w-[88%] max-w-sm flex-col bg-card text-fg shadow-2xl"
               initial={{ x: locale === "ar" ? "-100%" : "100%" }}
               animate={{ x: 0 }}
               exit={{ x: locale === "ar" ? "-100%" : "100%" }}

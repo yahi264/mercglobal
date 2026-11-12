@@ -159,7 +159,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             {t("learnMore")} <ArrowRight className="flip-rtl h-4 w-4" />
           </Link>
         </div>
-        <div className="relative" dir="ltr">
+        <div className="notranslate relative" dir="ltr" translate="no">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-page to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-page to-transparent" />
           <div className="flex w-max animate-marquee gap-4 hover:[animation-play-state:paused]">

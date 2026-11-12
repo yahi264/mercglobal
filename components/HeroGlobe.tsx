@@ -55,11 +55,11 @@ export function HeroGlobe({ className = "" }: { className?: string }) {
     let land: V[] = [];
     let W = 0, H = 0, dpr = 1, raf = 0, visible = true, running = false;
     let rot = 33 * RAD, tilt = 30 * RAD; // Türkiye facing the viewer
-    let dragV = 0, dragging = false, lastX = 0, autoSpin = 0.05 * RAD;
+    let dragV = 0, dragging = false, lastX = 0, lastY = 0, dragTilt = 0, releasedAt = -1e9, autoSpin = 0.05 * RAD;
     let leanX = 0, leanY = 0, tLeanX = 0, tLeanY = 0;
     const arcs: Arc[] = [];
     const pulses: number[] = [];
-    let nextSpawn = 0, start = performance.now();
+    let nextSpawn = 0, start = performance.now(), lastStamp = 0;
 
     const size = () => {
       const r = cv.getBoundingClientRect();
@@ -73,7 +73,7 @@ export function HeroGlobe({ className = "" }: { className?: string }) {
       const t = (now - start) / 1000;
       const R = Math.min(W, H) * 0.42 * (0.9 + 0.1 * ease(t / 1.6));
       const cx = W / 2, cy = H / 2;
-      const ro = rot + leanX * 0.25, ti = tilt + leanY * 0.18;
+      const ro = rot + leanX, ti = Math.max(-0.2, Math.min(1.2, tilt + dragTilt + leanY));
       const cr = Math.cos(ro), sr = Math.sin(ro), ct = Math.cos(ti), st = Math.sin(ti);
       const proj = (p: V): V => {
         const x = p[0] * cr - p[2] * sr;
@@ -178,16 +178,22 @@ export function HeroGlobe({ className = "" }: { className?: string }) {
         // drift back towards Türkiye after a drag, with a slow continuous sway
         dragV *= 0.94;
         rot += dragV + autoSpin * Math.sin((now - start) / 6000) * 0.12;
-        const home = 36 * RAD + Math.sin((now - start) / 9000) * 12 * RAD;
-        rot += (home - rot) * 0.004;
+        // after a drag the globe stays where it was left for a moment, then glides back to Türkiye
+        if (now - releasedAt > 2500) {
+          const home = 36 * RAD + Math.sin((now - start) / 9000) * 12 * RAD;
+          rot += (home - rot) * 0.0025;
+          dragTilt *= 0.985;
+        }
       }
-      leanX += (tLeanX - leanX) * 0.05;
-      leanY += (tLeanY - leanY) * 0.05;
+      leanX += (tLeanX - leanX) * 0.06;
+      leanY += (tLeanY - leanY) * 0.06;
       if (now > nextSpawn && land.length) {
         arcs.push(makeArc(now, Math.random() < 0.68));
         nextSpawn = now + 190 + Math.random() * 260;
       }
       draw(now);
+      if (((now / 250) | 0) !== ((lastStamp / 250) | 0)) cv.dataset.view = `${(rot * 57.3).toFixed(0)},${((tilt + dragTilt) * 57.3).toFixed(0)}`; // current angle, for checking
+      lastStamp = now;
       raf = requestAnimationFrame(tick);
     };
     const kick = () => { if (!running && !raf && !reduced) raf = requestAnimationFrame(tick); };
@@ -200,22 +206,36 @@ export function HeroGlobe({ className = "" }: { className?: string }) {
     const onVis = () => kick();
     document.addEventListener("visibilitychange", onVis);
 
-    // interaction: drag to spin, lean towards the mouse
-    const down = (e: PointerEvent) => { dragging = true; lastX = e.clientX; cv.setPointerCapture(e.pointerId); };
+    // interaction: the globe turns towards the mouse anywhere over the banner; grab it to spin it
+    // (left/right spins, up/down tilts). On touch screens a sideways swipe on the globe spins it.
+    const area = (cv.closest("section") as HTMLElement | null) ?? cv;
+    const down = (e: PointerEvent) => {
+      dragging = true; lastX = e.clientX; lastY = e.clientY; dragV = 0;
+      cv.setPointerCapture(e.pointerId); cv.style.cursor = "grabbing";
+    };
     const move = (e: PointerEvent) => {
       const r = cv.getBoundingClientRect();
-      tLeanX = ((e.clientX - r.left) / r.width - 0.5) * -0.6;
-      tLeanY = ((e.clientY - r.top) / r.height - 0.5) * -0.6;
+      const a = area.getBoundingClientRect();
+      const nx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (a.width / 2)));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (a.height / 2)));
+      tLeanX = nx * -0.55; // about 30° towards the pointer
+      tLeanY = ny * -0.35;
       if (!dragging) return;
-      const dx = e.clientX - lastX; lastX = e.clientX;
-      dragV = -dx * 0.004; rot += dragV;
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      dragV = -dx * 0.0045; rot += dragV;
+      dragTilt = Math.max(-0.6, Math.min(0.6, dragTilt - dy * 0.004));
     };
-    const up = () => { dragging = false; };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false; releasedAt = performance.now(); cv.style.cursor = "grab";
+    };
     const leave = () => { tLeanX = 0; tLeanY = 0; };
     cv.addEventListener("pointerdown", down);
-    window.addEventListener("pointermove", move, { passive: true });
+    area.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerup", up);
-    cv.addEventListener("pointerleave", leave);
+    window.addEventListener("pointercancel", up);
+    area.addEventListener("pointerleave", leave);
 
     fetch(asset("/land-dots.json"))
       .then((r) => r.json())
@@ -236,9 +256,10 @@ export function HeroGlobe({ className = "" }: { className?: string }) {
       ro.disconnect(); io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
       cv.removeEventListener("pointerdown", down);
-      window.removeEventListener("pointermove", move);
+      area.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
-      cv.removeEventListener("pointerleave", leave);
+      window.removeEventListener("pointercancel", up);
+      area.removeEventListener("pointerleave", leave);
     };
   }, []);
 

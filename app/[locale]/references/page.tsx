@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
 
 function List({ items }: { items: string[] }) {
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" dir="ltr">
+    <ul className="notranslate grid gap-3 sm:grid-cols-2 lg:grid-cols-3" dir="ltr" translate="no">
       {items.map((r) => {
         const [name, where] = r.split(" — ");
         return (
@@ -59,7 +59,7 @@ export default async function References({ params }: P) {
             {refs.partners.map((p) => (
               <li key={p.name} className="relative overflow-hidden rounded-2xl border border-brand/30 bg-card p-6 shadow-lg shadow-brand/5">
                 <span className="absolute inset-y-0 start-0 w-1.5 bg-brand" aria-hidden />
-                <p className="text-lg font-extrabold text-fg" dir="ltr">
+                <p className="notranslate text-lg font-extrabold text-fg" dir="ltr" translate="no">
                   {p.name}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-muted">
@@ -85,7 +85,7 @@ export default async function References({ params }: P) {
           <div className="grid gap-4 md:grid-cols-2">
             {refs.med.map((m) => (
               <div key={m.name} className="card p-6">
-                <p className="font-bold text-fg" dir="ltr">
+                <p className="notranslate font-bold text-fg" dir="ltr" translate="no">
                   {m.name}
                 </p>
                 <p className="mt-2 leading-relaxed text-muted">{m.text[l]}</p>
