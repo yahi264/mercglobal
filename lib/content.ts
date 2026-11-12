@@ -576,6 +576,20 @@ export const legal = {
 
 // ─── References ──────────────────────────────────────────────────────────────
 export const refs = {
+  // Current long-term partners (added Nov 2026 at the company's request)
+  partnersTitle: { en: "Current partners", tr: "Güncel iş ortaklarımız", ar: "شركاؤنا الحاليون", fr: "Partenaires actuels", ru: "Текущие партнёры" },
+  partnersIntro: {
+    en: "Companies we are currently working with on an ongoing basis.",
+    tr: "Halihazırda düzenli olarak birlikte çalıştığımız firmalar.",
+    ar: "شركات نعمل معها حالياً بشكل مستمر.",
+    fr: "Entreprises avec lesquelles nous travaillons actuellement de manière continue.",
+    ru: "Компании, с которыми мы сейчас работаем на постоянной основе.",
+  },
+  partnerSince: { en: "Working together since {y}", tr: "{y}'ten beri birlikte çalışıyoruz", ar: "نعمل معاً منذ {y}", fr: "Partenaires depuis {y}", ru: "Работаем вместе с {y} года" },
+  partners: [
+    { name: "Elbros Construction Limited", country: { en: "Malta", tr: "Malta", ar: "مالطا", fr: "Malte", ru: "Мальта" }, since: 2024, sector: { en: "Construction", tr: "İnşaat", ar: "البناء", fr: "Construction", ru: "Строительство" } },
+    { name: "EOS (Energy Outsourcing Services)", country: { en: "Serbia", tr: "Sırbistan", ar: "صربيا", fr: "Serbie", ru: "Сербия" }, since: 2023, sector: { en: "Energy", tr: "Enerji", ar: "الطاقة", fr: "Énergie", ru: "Энергетика" } },
+  ] as { name: string; country: L; since: number; sector: L }[],
   intlTitle: { en: "International clients — Oil & Gas and Construction", tr: "Uluslararası müşterilerimiz — Petrol & Gaz ve İnşaat", ar: "عملاؤنا الدوليون — النفط والغاز والبناء", fr: "Clients internationaux — Pétrole, gaz et construction", ru: "Международные клиенты — нефть, газ и строительство" },
   intl: [
     "Al-Mawarid Group — K.S.A.", "Al-Mabani Group — K.S.A.", "Al-Mansouriyah Construction Co — K.S.A.", "Saudi Freysinet Construction Co — K.S.A.",
@@ -648,4 +662,4 @@ export const refs = {
   ],
 };
 
-export const referenceCount = refs.intl.length + refs.tr.length + refs.med.length + refs.catering.length;
+export const referenceCount = refs.partners.length + refs.intl.length + refs.tr.length + refs.med.length + refs.catering.length;

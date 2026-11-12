@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
-import { asset } from "@/lib/asset";
 import { LanguageRow, LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 import { WhatsAppIcon } from "./Icons";
+import { Logo } from "./Logo";
 
 export type NavLink = { href: string; label: string };
 export type NavItem = NavLink & { children?: NavLink[] };
@@ -92,17 +92,8 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
         }`}
       >
         <div className="container-x flex h-[72px] items-center justify-between gap-2 sm:gap-4">
-          <Link href={`/${locale}/`} className="flex min-w-0 shrink items-center gap-2.5 sm:gap-3" aria-label={`Merç Global — ${labels.home}`}>
-            <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-1 shadow-sm ring-1 ring-black/5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={asset("/img/mark.png")} alt="" width={40} height={40} className="h-full w-full object-contain" />
-            </span>
-            <span className="leading-tight" dir="ltr">
-              <span className="block text-[17px] font-extrabold tracking-tight text-fg">
-                MERÇ <span className="text-brand">GLOBAL</span>
-              </span>
-              <span className="block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.06em] text-muted sm:text-[10.5px] sm:tracking-[0.14em]">Merç Global Group</span>
-            </span>
+          <Link href={`/${locale}/`} className="flex min-w-0 shrink items-center" aria-label={`Merç Global — ${labels.home}`}>
+            <Logo className="[--lh:27px] min-[400px]:[--lh:30px] sm:[--lh:38px] lg:[--lh:40px]" />
           </Link>
 
           {/* Desktop navigation */}
@@ -183,9 +174,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
               data-lenis-prevent
             >
               <div className="flex h-[72px] items-center justify-between border-b border-line px-5">
-                <span className="text-lg font-extrabold" dir="ltr">
-                  MERÇ <span className="text-brand">GLOBAL</span>
-                </span>
+                <Logo className="[--lh:30px]" />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

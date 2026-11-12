@@ -28,7 +28,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) 
   useEffect(() => {
     if (paused) return;
     const intro = !changed && document.documentElement.classList.contains("intro");
-    const id = setTimeout(() => go(i + 1), intro ? 11000 : 6500);
+    const id = setTimeout(() => go(i + 1), intro ? 9000 : 6500);
     return () => clearTimeout(id);
   }, [i, paused, go, changed]);
   useEffect(() => {

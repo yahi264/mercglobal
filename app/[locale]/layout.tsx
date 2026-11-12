@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { Cairo, Manrope } from "next/font/google";
+import { Cairo, Manrope, Tinos } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -14,6 +14,7 @@ import { href, navItems } from "@/lib/nav";
 import { asset } from "@/lib/asset";
 
 const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], weight: ["400", "500", "600", "700", "800"], variable: "--font-manrope" });
+const tinos = Tinos({ subsets: ["latin", "latin-ext"], weight: ["700"], variable: "--font-logo" });
 const cairo = Cairo({ subsets: ["arabic", "latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-cairo" });
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
@@ -49,7 +50,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const t = getT(l);
 
   return (
-    <html lang={l} dir={dirOf(l)} className={`${manrope.variable} ${cairo.variable}`} suppressHydrationWarning>
+    <html lang={l} dir={dirOf(l)} className={`${manrope.variable} ${cairo.variable} ${tinos.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript + introScript }} />
       </head>

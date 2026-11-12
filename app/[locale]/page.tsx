@@ -13,7 +13,7 @@ import { asset } from "@/lib/asset";
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const l = (await params).locale as Locale;
   const t = getT(l);
-  const marquee = [...refs.intl, ...refs.tr.slice(0, 8), ...refs.catering.slice(0, 6)].map((r) => r.split(" — ")[0]);
+  const marquee = [...refs.partners.map((p) => p.name), ...refs.intl, ...refs.tr.slice(0, 8), ...refs.catering.slice(0, 6)].map((r) => r.split(" — ")[0]);
 
   return (
     <>

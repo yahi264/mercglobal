@@ -49,7 +49,7 @@
   function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3); }
   function easeIn(x) { return x < 0 ? 0 : x > 1 ? 1 : x * x * x; }
 
-  var FIX = location.search.match(/introAt=([0-9.]+)/), t0 = performance.now(), rot, tilt, R, cx, cy;
+  var SPEED = 1.8, FIX = location.search.match(/introAt=([0-9.]+)/), t0 = performance.now(), rot, tilt, R, cx, cy;
   var gridEl = document.querySelector(".intro-grid"), css = gridEl && gridEl.getAnimations ? gridEl.getAnimations()[0] : null;
   if (css && css.currentTime) t0 -= css.currentTime; // start in step with the CSS animations
   function proj(p) {
@@ -64,7 +64,7 @@
 
   function frame(now) {
     if (!D.classList.contains("intro") || D.classList.contains("intro-skip")) { c.clearRect(0, 0, W, H); return; }
-    var t = FIX ? +FIX[1] : (now - t0) / 1000;
+    var t = (FIX ? +FIX[1] : (now - t0) / 1000) * SPEED; // story time: the globe part lasts about 2 s
     if (t > 3.6) { c.clearRect(0, 0, W, H); return; }
     rot = (-40 + 73 * ease(t / 2.3)) * RAD; // spins until Türkiye faces the viewer
     tilt = (20 + 14 * ease(t / 2.3)) * RAD;
@@ -75,7 +75,7 @@
     var hp = proj(HUB);
     var centre = ease((t - 2.05) / 0.7); // glide Ankara to the middle, where the logo will appear
     cx += (W / 2 - hp[0]) * centre;
-    cy += (H / 2 - (small ? 62 : 78) - hp[1]) * centre; // the logo mark sits above the middle
+    cy += (H / 2 - hp[1]) * centre; // the logo appears in the middle
     var fade = Math.min(1, t / 0.5) * (1 - ease((t - 2.65) / 0.75));
     c.clearRect(0, 0, W, H);
 

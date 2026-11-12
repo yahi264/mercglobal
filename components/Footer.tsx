@@ -6,6 +6,7 @@ import { href } from "@/lib/nav";
 import { asset } from "@/lib/asset";
 import { WhatsAppIcon } from "./Icons";
 import { LanguageRow } from "./LanguageSwitcher";
+import { Logo } from "./Logo";
 
 export function Footer({ locale: l }: { locale: Locale }) {
   const t = getT(l);
@@ -30,14 +31,8 @@ export function Footer({ locale: l }: { locale: Locale }) {
 
       <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="mb-5 flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={asset("/img/mark.png")} alt="" width={40} height={40} className="h-full w-full object-contain" loading="lazy" />
-            </span>
-            <span className="text-lg font-extrabold text-white" dir="ltr">
-              MERÇ <span className="text-brand">GLOBAL</span>
-            </span>
+          <div className="mb-5">
+            <Logo tone="light" className="[--lh:40px]" />
           </div>
           <p className="leading-relaxed">{text.tagline[l]}</p>
           <div className="mt-6 text-white">

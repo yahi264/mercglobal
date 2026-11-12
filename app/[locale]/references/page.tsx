@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Building2, HeartPulse, UtensilsCrossed, Landmark } from "lucide-react";
+import { Building2, HeartPulse, UtensilsCrossed, Landmark, Handshake } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { CtaBand } from "@/components/Blocks";
@@ -52,6 +52,26 @@ export default async function References({ params }: P) {
     <>
       <PageHero title={t("navReferences")} eyebrow={t("navCorporate")} image="/img/slide/1.webp" crumbs={[{ href: href(l), label: t("navHome") }, { label: t("navReferences") }]} />
       <div className="container-x space-y-16 py-20">
+        <Reveal>
+          <Heading icon={Handshake} title={refs.partnersTitle[l]} n={refs.partners.length} />
+          <p className="-mt-3 mb-6 text-muted">{refs.partnersIntro[l]}</p>
+          <ul className="grid gap-4 md:grid-cols-2">
+            {refs.partners.map((p) => (
+              <li key={p.name} className="relative overflow-hidden rounded-2xl border border-brand/30 bg-card p-6 shadow-lg shadow-brand/5">
+                <span className="absolute inset-y-0 start-0 w-1.5 bg-brand" aria-hidden />
+                <p className="text-lg font-extrabold text-fg" dir="ltr">
+                  {p.name}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-muted">
+                  {p.country[l]} · {p.sector[l]}
+                </p>
+                <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand">
+                  {refs.partnerSince[l].replace("{y}", String(p.since))}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
         <Reveal>
           <Heading icon={Building2} title={refs.intlTitle[l]} n={refs.intl.length} />
           <List items={refs.intl} />

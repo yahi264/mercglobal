@@ -121,9 +121,9 @@ html[dir="rtl"] .flip-rtl {
   }
 }
 
-/* ─── Intro (first visit). Timeline (ms):
-   globe + routes 0–2600 · dive into Ankara 2350–3400 · mark draws 2700–4000 · name 3050–4100
-   bar 2700–4300 · brand out 4350 · red ring opens the page 4450–5450 ─── */
+/* ─── Intro (first visit). Timeline (ms), about 3 s in total:
+   globe + routes 0–1300 · dive into Ankara 1280–1900 · logo 1200–1800 (holds) · bar 1200–2100
+   brand out 2250 · red ring opens the page 2350–3100 ─── */
 @property --hole {
   syntax: "<length>";
   inherits: false;
@@ -137,14 +137,14 @@ html.intro #intro {
   position: fixed;
   inset: 0;
   z-index: 100;
-  animation: introGone 0s linear 5500ms forwards;
+  animation: introGone 0s linear 3100ms forwards;
 }
 html.intro body {
   overflow: hidden;
 }
 html.intro-skip #intro {
   opacity: 0;
-  transition: opacity 0.45s ease;
+  transition: opacity 0.35s ease;
 }
 .intro-panel {
   position: absolute;
@@ -156,7 +156,7 @@ html.intro-skip #intro {
   background: radial-gradient(ellipse at 50% 40%, #0d1f38 0%, #07111f 55%, #040a14 100%);
   -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
   mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
-  animation: holeOpen 1s cubic-bezier(0.7, 0, 0.2, 1) 4450ms forwards;
+  animation: holeOpen 0.75s cubic-bezier(0.7, 0, 0.2, 1) 2350ms forwards;
 }
 .intro-canvas {
   position: absolute;
@@ -176,7 +176,7 @@ html.intro-skip #intro {
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
-  animation: ringOpen 1s cubic-bezier(0.7, 0, 0.2, 1) 4450ms forwards;
+  animation: ringOpen 0.75s cubic-bezier(0.7, 0, 0.2, 1) 2350ms forwards;
 }
 .intro-glow {
   position: absolute;
@@ -184,7 +184,7 @@ html.intro-skip #intro {
   background: radial-gradient(circle at 50% 48%, rgba(227, 20, 30, 0.22), transparent 40%),
     radial-gradient(circle at 12% 88%, rgba(30, 58, 95, 0.6), transparent 50%);
   opacity: 0;
-  animation: fadeIn 1.2s ease 2400ms forwards;
+  animation: fadeIn 0.8s ease 1300ms forwards;
 }
 .intro-grid {
   position: absolute;
@@ -193,57 +193,37 @@ html.intro-skip #intro {
     linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
-  animation: gridIn 2s ease-out both;
+  animation: gridIn 1.2s ease-out both;
 }
 .intro-brand {
-  animation: contentOut 0.45s cubic-bezier(0.55, 0, 0.45, 1) 4350ms forwards;
+  animation: contentOut 0.35s cubic-bezier(0.55, 0, 0.45, 1) 2250ms forwards;
 }
-.intro-mark {
-  filter: drop-shadow(0 0 22px rgba(227, 20, 30, 0.6));
-}
-.intro-path {
-  stroke: #e3141e;
-  stroke-width: 4.2;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: drawLine 0.95s cubic-bezier(0.65, 0, 0.35, 1) both;
-  animation-delay: calc(2700ms + var(--i) * 100ms);
-}
-.intro-dot {
-  fill: #e3141e;
-  fill-opacity: 0;
-  animation: drawLine 0.5s ease both, dotFill 0.4s ease forwards;
-  animation-delay: 3150ms, 3550ms;
-}
-.intro-name {
-  perspective: 600px;
-}
-.intro-letter {
-  display: inline-block;
+/* original logo: the mark rises out of a soft red glow, the lettering wipes in from the left */
+.intro-logo .logo-mark {
+  filter: drop-shadow(0 0 18px rgba(227, 20, 30, 0.65));
   opacity: 0;
-  transform: translateY(0.7em) rotateX(-70deg);
-  filter: blur(6px);
-  animation: letterIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: calc(3050ms + var(--i) * 45ms);
+  animation: markIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 1200ms forwards;
+}
+.intro-logo .logo-text {
+  clip-path: inset(0 100% 0 0);
+  animation: wipeIn 0.5s cubic-bezier(0.65, 0, 0.35, 1) 1300ms forwards;
 }
 .intro-tag {
   opacity: 0;
-  animation: fadeUp 0.8s ease forwards 3500ms;
+  animation: fadeUp 0.5s ease forwards 1500ms;
 }
 .intro-bar span {
   transform: scaleX(0);
   transform-origin: left;
-  animation: barFill 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards 2700ms;
+  animation: barFill 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards 1200ms;
 }
 .intro-skip-hint {
   opacity: 0;
-  animation: fadeIn 0.6s ease 900ms forwards, contentOut 0.3s ease 4300ms forwards;
+  animation: fadeIn 0.4s ease 500ms forwards, contentOut 0.3s ease 2200ms forwards;
 }
 
-@keyframes drawLine { 0% { stroke-dashoffset: 1; opacity: 0; } 8% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
-@keyframes dotFill { to { fill-opacity: 1; } }
-@keyframes letterIn { to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes markIn { from { opacity: 0; transform: translateY(14px) scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes wipeIn { to { clip-path: inset(0 0 0 0); } }
 @keyframes barFill { to { transform: scaleX(1); } }
 @keyframes contentOut { to { opacity: 0; transform: translateY(-20px) scale(0.94); filter: blur(4px); } }
 @keyframes holeOpen { to { --hole: 150vmax; } }
@@ -262,7 +242,7 @@ html.intro-skip #intro {
   --base: 120ms;
 }
 html.intro .hero-first {
-  --base: 4800ms;
+  --base: 2600ms;
 }
 html.intro-skip .hero-first {
   --base: 350ms;
@@ -293,7 +273,7 @@ html.intro-skip .hero-first {
 
 /* The first photo zooms out slowly as the curtain lifts */
 html.intro .hero-pic img {
-  animation: heroZoom 3s cubic-bezier(0.22, 1, 0.36, 1) 4450ms both;
+  animation: heroZoom 2.6s cubic-bezier(0.22, 1, 0.36, 1) 2350ms both;
 }
 @keyframes heroZoom { from { transform: scale(1.22); } to { transform: scale(1); } }
 .intro-name {
@@ -307,7 +287,7 @@ html.intro .hero-pic img {
   animation-delay: var(--gb);
 }
 html.intro .hero-globe {
-  --gb: 4500ms;
+  --gb: 2400ms;
 }
 html.intro-skip .hero-globe {
   --gb: 300ms;
@@ -327,4 +307,29 @@ p.hero-badge {
 @keyframes floaty {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+/* ─── Original logo lockup (components/Logo.tsx). --lh = logo height ─── */
+.logo {
+  gap: calc(var(--lh, 40px) * 0.22);
+}
+.logo-mark {
+  height: var(--lh, 40px);
+}
+.logo-l1 {
+  font-size: calc(var(--lh, 40px) * 0.43);
+  letter-spacing: 0.005em;
+}
+.logo-text {
+  text-align: left;
+}
+.logo-l2 {
+  font-size: calc(var(--lh, 40px) * 0.3);
+  margin-top: calc(var(--lh, 40px) * 0.04);
+}
+.font-logo {
+  font-family: var(--font-logo), "Times New Roman", Times, serif;
+}
+html[lang="ar"] .font-logo {
+  font-family: var(--font-logo), "Times New Roman", Times, serif;
 }
