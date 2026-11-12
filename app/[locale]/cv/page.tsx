@@ -22,16 +22,24 @@ export default async function CvPage({ params }: P) {
           defaultLang={l === "tr" ? "tr" : "en"}
           email={company.emails[0]}
           whatsapp={company.whatsapp[0].number}
+          endpoint={company.cvEndpoint}
           ui={{
             language: t("cvLanguage"),
             example: t("cvExample"),
             clear: t("cvClear"),
             download: t("cvDownload"),
-            send: t("cvSend"),
+            sendNow: t("cvSendNow"),
+            sending: t("cvSending"),
+            sentOk: t("cvSentOk"),
+            sentFail: t("cvSentFail"),
+            needContact: t("cvNeedContact"),
+            other: t("cvOther"),
+            email: t("fSendEmail"),
             whatsapp: t("fSendWhatsApp"),
             saved: t("cvSaved"),
-            sendNote: t("cvSendNote"),
             preview: t("cvPreview"),
+            message: t("cvMessage"),
+            messageHint: t("cvMessageHint"),
           }}
         />
         <p className="mt-10 text-center text-sm font-semibold text-muted">{t("cFree")}</p>

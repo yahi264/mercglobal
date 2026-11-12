@@ -10,13 +10,13 @@ import { dirOf, type Locale } from "@/lib/i18n";
 // translate="no" stops browser auto-translation from rewriting it.
 const TEXT: Record<Locale, [string, string]> = {
   tr: ["MERÇ GLOBAL İSTİHDAM", "Eğitim ve Danışmanlık Hizmetleri Ltd."],
-  en: ["MERÇ GLOBAL EMPLOYMENT", "Education and Consultancy Services Ltd."],
-  ar: ["ميرتش جلوبال للتوظيف", "للتعليم والخدمات الاستشارية المحدودة"],
-  fr: ["MERÇ GLOBAL EMPLOI", "Services d'Éducation et de Conseil Ltd."],
-  ru: ["MERÇ GLOBAL КАДРЫ", "Образовательные и консалтинговые услуги Ltd."],
-  de: ["MERÇ GLOBAL PERSONAL", "Bildungs- und Beratungsdienstleistungen Ltd."],
-  es: ["MERÇ GLOBAL EMPLEO", "Servicios de Educación y Consultoría Ltd."],
-  zh: ["MERÇ GLOBAL 人力资源", "教育与咨询服务有限公司"],
+  en: ["MERÇ GLOBAL RECRUITMENT", "Training and Consulting Services Ltd."],
+  ar: ["ميرتش جلوبال للتوظيف", "خدمات التدريب والاستشارات المحدودة"],
+  fr: ["MERÇ GLOBAL RECRUTEMENT", "Services de Formation et de Conseil Ltd."],
+  ru: ["MERÇ GLOBAL РЕКРУТИНГ", "Услуги обучения и консалтинга Ltd."],
+  de: ["MERÇ GLOBAL REKRUTIERUNG", "Schulungs- und Beratungsdienstleistungen Ltd."],
+  es: ["MERÇ GLOBAL RECLUTAMIENTO", "Servicios de Formación y Consultoría Ltd."],
+  zh: ["MERÇ GLOBAL 招聘", "培训与咨询服务有限公司"],
 };
 
 export function Logo({ locale, tone = "auto", className = "", fit = false }: { locale: Locale; tone?: "auto" | "light"; className?: string; fit?: boolean }) {

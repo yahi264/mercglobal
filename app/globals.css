@@ -512,3 +512,39 @@ html[lang="zh"] {
     overflow: visible !important;
   }
 }
+
+/* ─── "Live" glow for Job Vacancies (pulses like the WhatsApp button) ─── */
+.live-dot {
+  position: relative;
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: #fff;
+}
+.live-dot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: livePing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.text-brand .live-dot,
+.live-dot.red {
+  background: var(--color-brand);
+}
+.glow-btn {
+  animation: glowPulse2 2.4s ease-in-out infinite;
+}
+.glow-btn:hover {
+  filter: brightness(1.06);
+}
+@keyframes livePing {
+  75%, 100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes glowPulse2 {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(227, 20, 30, 0.55), 0 6px 18px rgba(227, 20, 30, 0.25); }
+  50% { box-shadow: 0 0 0 8px rgba(227, 20, 30, 0), 0 6px 22px rgba(227, 20, 30, 0.45); }
+}

@@ -17,6 +17,9 @@ export const company = {
   addressLines: ["Kızılay Mahallesi, Fevzi Çakmak 1 Sokak", "No: 17/4, Kızılay / Ankara — Türkiye"],
   mapEmbed:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3059.8077600382876!2d32.84815607529081!3d39.92331808552354!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14d34efe2d12f54b%3A0x9c81a6be6cf040ca!2sMer%C3%A7%20Global%20Group!5e0!3m2!1sen!2str!4v1672994862498!5m2!1sen!2str",
+  // CV builder "Send": FormSubmit (formsubmit.co) forwards submissions to this mailbox. The very first
+  // submission makes FormSubmit email an activation link to the address — click it once.
+  cvEndpoint: "https://formsubmit.co/ajax/info@mercglobal.com.tr",
   mapLink: "https://www.google.com/maps/search/?api=1&query=Mer%C3%A7+Global+Group+Ankara",
   licenceNo: "494",
   licenceDate: "22/09/2011",

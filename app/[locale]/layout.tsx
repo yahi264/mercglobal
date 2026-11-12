@@ -5,6 +5,8 @@ import "../globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingContact } from "@/components/FloatingContact";
+import { Assistant } from "@/components/Assistant";
+import { buildKb } from "@/lib/assistant-kb";
 import { BackToTop, PageFade, ScrollProgress, SmoothScroll } from "@/components/Motion";
 import { Intro } from "@/components/Intro";
 import { introScript, themeScript } from "@/lib/head-scripts";
@@ -69,6 +71,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <PageFade>{children}</PageFade>
         </main>
         <Footer locale={l} />
+        <Assistant kb={buildKb(l)} />
         <FloatingContact
           whatsapp={company.whatsapp}
           phoneHref={company.phoneHref}

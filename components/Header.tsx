@@ -12,7 +12,7 @@ import { WhatsAppIcon } from "./Icons";
 import { Logo } from "./Logo";
 
 export type NavLink = { href: string; label: string };
-export type NavItem = NavLink & { children?: NavLink[] };
+export type NavItem = NavLink & { children?: NavLink[]; highlight?: boolean };
 
 type Props = {
   locale: Locale;
@@ -32,7 +32,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
   // language, and browsers may auto-translate them). Otherwise the compact ☰ menu is used.
   const rowRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLAnchorElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null); // language + theme buttons (always shown)
   const measureRef = useRef<HTMLDivElement>(null);
   const [compact, setCompact] = useState<boolean | null>(null);
   useEffect(() => {
@@ -45,7 +45,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
         if (window.innerWidth < 1280) return setCompact(true);
         const cs = getComputedStyle(row);
         const inner = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-        const free = inner - logo.scrollWidth - actions.offsetWidth - 40;
+        const free = inner - logo.scrollWidth - actions.offsetWidth - 26; // two gaps between logo / menu / buttons
         setCompact(measure.scrollWidth > free);
       }, 60);
     };
@@ -125,18 +125,19 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
           scrolled ? "border-line bg-card/85 shadow-lg shadow-navy/5 backdrop-blur-xl" : "border-transparent bg-card"
         }`}
       >
-        <div ref={rowRef} className="container-x relative flex h-[72px] items-center justify-between gap-2 sm:gap-4">
+        <div ref={rowRef} className="container-x relative flex h-[72px] items-center justify-between gap-2 sm:gap-4 xl:gap-3">
           {/* invisible copy of the menu, used only to measure how wide it is */}
           <div ref={measureRef} aria-hidden className="pointer-events-none invisible absolute start-0 top-0 -z-10 flex h-0 overflow-hidden whitespace-nowrap">
             {items.map((it) => (
-              <span key={it.href} className="flex items-center gap-1 px-2.5 text-[13.5px] font-semibold">
+              <span key={it.href} className={`flex items-center gap-1 text-[13px] ${it.highlight ? "mx-1 px-3 font-bold" : "px-2 font-semibold"}`}>
+                {it.highlight && <span className="inline-block w-4" />}
                 {it.label}
                 {it.children && <span className="inline-block w-3.5" />}
               </span>
             ))}
           </div>
           <Link ref={logoRef} href={`/${locale}/`} className="flex min-w-0 shrink items-center overflow-hidden" aria-label={`Merç Global — ${labels.home}`}>
-            <Logo locale={locale} fit className="[--lh:30px] sm:[--lh:38px] lg:[--lh:40px]" />
+            <Logo locale={locale} fit className="[--lh:30px] sm:[--lh:38px] xl:[--lh:35px]" />
           </Link>
 
           {/* Desktop navigation */}
@@ -146,7 +147,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 <div key={it.href} className="group relative">
                   <Link
                     href={it.href}
-                    className={`flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
+                    className={`flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-2 text-[13px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
                   >
                     {it.label}
                     <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
@@ -170,18 +171,25 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 <Link
                   key={it.href}
                   href={it.href}
-                  className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[13.5px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`}
+                  className={
+                    it.highlight
+                      ? "glow-btn relative mx-1 inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-brand px-3 py-1.5 text-[13px] font-bold text-white"
+                      : `whitespace-nowrap rounded-full px-2 py-2 text-[13px] font-semibold transition-colors hover:text-brand ${isActive(it.href) ? "text-brand" : "text-fg"}`
+                  }
                 >
+                  {it.highlight && <span className="live-dot" aria-hidden />}
                   {it.label}
                 </Link>
               ),
             )}
           </nav>
 
-          <div ref={actionsRef} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <div ref={actionsRef} className="flex items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher locale={locale} label={labels.language} />
             <div className="max-[359px]:hidden">
               <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
+            </div>
             </div>
             <Link href={cta.href} className={`btn-brand ${ctaShow} whitespace-nowrap !px-5 !py-2.5`}>
               {cta.label}
@@ -233,7 +241,8 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 {items.map((it) => (
                   <div key={it.href} className="border-b border-line/70 last:border-0">
                     <div className="flex items-center">
-                      <Link href={it.href} className={`flex-1 px-3 py-3.5 text-[15px] font-semibold ${isActive(it.href) ? "text-brand" : ""}`}>
+                      <Link href={it.href} className={`flex-1 px-3 py-3.5 text-[15px] font-semibold ${isActive(it.href) || it.highlight ? "text-brand" : ""}`}>
+                        {it.highlight && <span className="live-dot me-2.5 align-middle" aria-hidden />}
                         {it.label}
                       </Link>
                       {it.children && (
