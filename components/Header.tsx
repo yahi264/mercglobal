@@ -282,7 +282,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 <LanguageRow locale={locale} onPick={() => setOpen(false)} />
                 <div className="grid grid-cols-2 gap-2">
                   <a href={contact.phoneHref} className="btn-outline whitespace-nowrap !px-2 !text-[13px]">
-                    <Phone className="h-4 w-4" /> <span dir="ltr">0312 230 31 82</span>
+                    <Phone className="h-4 w-4" /> <span dir="ltr">+90 312 230 31 82</span>
                   </a>
                   <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="btn-wa whitespace-nowrap !px-2 !text-[13px]">
                     <WhatsAppIcon className="h-4 w-4" /> WhatsApp

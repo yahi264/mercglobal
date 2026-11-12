@@ -75,7 +75,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <FloatingContact
           whatsapp={company.whatsapp}
           phoneHref={company.phoneHref}
-          labels={{ call: `${t("callNow")} · 0312 230 31 82`, write: t("writeWhatsApp"), close: t("close") }}
+          labels={{ call: `${t("callNow")} · +90 312 230 31 82`, write: t("writeWhatsApp"), close: t("close") }}
           greeting={`Merç Global — ${t("getInfo")}`}
         />
         <BackToTop label={t("backToTop")} />
