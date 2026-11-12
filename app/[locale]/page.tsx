@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, CheckCircle2, Globe2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Briefcase, CheckCircle2, FileText, Globe2 } from "lucide-react";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CtaBand, SectorCard, ServiceCard } from "@/components/Blocks";
 import { SectionHeading } from "@/components/PageHero";
@@ -170,6 +170,31 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Job seekers */}
+      <section className="container-x pt-16 sm:pt-20">
+        <Reveal>
+          <div className="card flex flex-col items-start justify-between gap-6 p-8 sm:p-10 lg:flex-row lg:items-center">
+            <div className="flex items-start gap-5">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
+                <Briefcase className="h-7 w-7" strokeWidth={1.75} />
+              </span>
+              <div>
+                <h2 className="text-2xl font-extrabold text-fg">{t("lookingJob")}</h2>
+                <p className="mt-2 max-w-2xl text-muted">{t("lookingJobText")}</p>
+              </div>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Link href={href(l, "jobs")} className="btn-brand">
+                {t("navJobs")} <ArrowRight className="flip-rtl h-4 w-4" />
+              </Link>
+              <Link href={href(l, "cv")} className="btn-outline">
+                <FileText className="h-4 w-4" /> {t("navCv")}
+              </Link>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       <CtaBand l={l} />

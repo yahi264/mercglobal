@@ -136,7 +136,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
             ))}
           </div>
           <Link ref={logoRef} href={`/${locale}/`} className="flex min-w-0 shrink items-center overflow-hidden" aria-label={`Merç Global — ${labels.home}`}>
-            <Logo className="[--lh:min(30px,calc((100vw_-_182px)/7.4))] sm:[--lh:38px] lg:[--lh:40px]" />
+            <Logo locale={locale} fit className="[--lh:30px] sm:[--lh:38px] lg:[--lh:40px]" />
           </Link>
 
           {/* Desktop navigation */}
@@ -180,7 +180,9 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
 
           <div ref={actionsRef} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher locale={locale} label={labels.language} />
-            <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
+            <div className="max-[359px]:hidden">
+              <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
+            </div>
             <Link href={cta.href} className={`btn-brand ${ctaShow} whitespace-nowrap !px-5 !py-2.5`}>
               {cta.label}
             </Link>
@@ -217,7 +219,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
               data-lenis-prevent
             >
               <div className="flex h-[72px] items-center justify-between border-b border-line px-5">
-                <Logo className="[--lh:30px]" />
+                <Logo locale={locale} fit className="[--lh:28px]" />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

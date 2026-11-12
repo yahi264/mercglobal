@@ -32,7 +32,7 @@ export function Footer({ locale: l }: { locale: Locale }) {
       <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="mb-5">
-            <Logo tone="light" className="[--lh:40px]" />
+            <Logo locale={l} tone="light" className="[--lh:40px]" />
           </div>
           <p className="leading-relaxed">{text.tagline[l]}</p>
           <div className="mt-6 text-white">
@@ -46,6 +46,8 @@ export function Footer({ locale: l }: { locale: Locale }) {
             <li><Link className={link} href={href(l, "about")}>{t("navAbout")}</Link></li>
             <li><Link className={link} href={href(l, "certificates")}>{t("navCertificates")}</Link></li>
             <li><Link className={link} href={href(l, "references")}>{t("navReferences")}</Link></li>
+            <li><Link className={link} href={href(l, "jobs")}>{t("navJobs")}</Link></li>
+            <li><Link className={link} href={href(l, "cv")}>{t("navCv")}</Link></li>
             <li><Link className={link} href={href(l, "careers")}>{t("navCareers")}</Link></li>
           </ul>
         </div>

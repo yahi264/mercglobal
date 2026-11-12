@@ -14,7 +14,19 @@ const run = (cmd, opts = {}) => execSync(cmd, { stdio: "inherit", ...opts });
 
 rmSync(OUT, { recursive: true, force: true });
 rmSync(".next", { recursive: true, force: true });
-run("npx next build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: BASE } });
+// Google Fonts downloads occasionally fail for a moment: retry the build up to 3 times.
+for (let attempt = 1; ; attempt++) {
+  try {
+    run("npx next build", { env: { ...process.env, NEXT_PUBLIC_BASE_PATH: BASE } });
+    break;
+  } catch (e) {
+    if (attempt >= 3) throw e;
+    console.log(`
+Build failed (attempt ${attempt}), retrying…
+`);
+    rmSync(".next", { recursive: true, force: true });
+  }
+}
 
 // Home address and unknown addresses: send visitors to their language
 // (their earlier choice on this site, otherwise their browser's language, otherwise English).
@@ -22,7 +34,7 @@ const redirect = (title) => `<!doctype html><html><head><meta charset="utf-8"><t
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="${BASE}/icon.png">
 <script>
-var l=["en","tr","ar","fr","ru"],p="en",s=null;
+var l=["en","tr","ar","fr","ru","de","es","zh"],p="en",s=null;
 try{s=localStorage.getItem("merc-lang")}catch(e){}
 if(s&&l.indexOf(s)>-1){p=s}else{var w=(navigator.languages||[navigator.language||"en"]).map(function(x){return String(x).slice(0,2).toLowerCase()});
 for(var i=0;i<w.length;i++){if(l.indexOf(w[i])>-1){p=w[i];break}}}

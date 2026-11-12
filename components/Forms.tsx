@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, AlertCircle } from "lucide-react";
 import { WhatsAppIcon } from "./Icons";
 
@@ -35,6 +35,18 @@ export function ContactForm({ fields, subject, email, whatsapp, labels, note, em
   const [touched, setTouched] = useState(false);
 
   const set = (k: string, v: string) => setValues((s) => ({ ...s, [k]: v }));
+
+  // Pre-fill from the address, e.g. ?position=Welder — Basra (when coming from a job vacancy)
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const pre: Record<string, string> = {};
+    for (const f of fields) {
+      const v = q.get(f.name);
+      if (v) pre[f.name] = v;
+    }
+    if (Object.keys(pre).length) setValues((s) => ({ ...pre, ...s }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validate = () => {
     setTouched(true);

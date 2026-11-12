@@ -320,9 +320,6 @@ p.hero-badge {
   font-size: calc(var(--lh, 40px) * 0.43);
   letter-spacing: 0.005em;
 }
-.logo-text {
-  text-align: left;
-}
 .logo-l2 {
   font-size: calc(var(--lh, 40px) * 0.3);
   margin-top: calc(var(--lh, 40px) * 0.04);
@@ -330,6 +327,188 @@ p.hero-badge {
 .font-logo {
   font-family: var(--font-logo), "Times New Roman", Times, serif;
 }
-html[lang="ar"] .font-logo {
-  font-family: var(--font-logo), "Times New Roman", Times, serif;
+.logo[lang="ar"] .font-logo {
+  font-family: var(--font-cairo), "Times New Roman", serif;
+}
+.logo[lang="zh"] .font-logo {
+  font-family: var(--font-logo), "Songti SC", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+}
+.logo .logo-text {
+  text-align: start;
+}
+/* Chinese pages: system Chinese fonts after the Latin one */
+html[lang="zh"] {
+  --font-sans: var(--font-manrope), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-display: var(--font-manrope), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+}
+
+/* ─── CV builder sheet (components/CvBuilder.tsx). Sized in em, so the same layout scales on screen and prints on A4 ─── */
+.cv-sheet {
+  --cv-red: #e3141e;
+  --cv-navy: #0b1a2e;
+  font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif;
+  font-size: calc(100cqw / 58);
+  aspect-ratio: 210 / 297;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #1b2533;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cv-head {
+  display: flex;
+  align-items: center;
+  gap: 1.4em;
+  padding: 2.2em 2.4em 1.8em;
+  background: linear-gradient(120deg, var(--cv-navy) 0%, #12263f 70%, #1e3a5f 100%);
+  color: #fff;
+  border-bottom: 0.35em solid var(--cv-red);
+}
+.cv-photo {
+  width: 6.4em;
+  height: 6.4em;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0.22em solid #fff;
+  flex-shrink: 0;
+}
+.cv-kicker {
+  font-size: 0.72em;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #ff8a90;
+  font-weight: 700;
+}
+.cv-name {
+  font-size: 2.2em;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-top: 0.15em;
+  overflow-wrap: anywhere;
+}
+.cv-role {
+  font-size: 1.05em;
+  margin-top: 0.3em;
+  color: #dbe5f2;
+  font-weight: 600;
+}
+.cv-body {
+  display: grid;
+  grid-template-columns: 34% 1fr;
+  flex: 1;
+}
+.cv-side {
+  background: #f3f6fa;
+  padding: 1.8em 1.4em;
+  font-size: 0.92em;
+}
+.cv-main {
+  padding: 1.8em 2em;
+}
+.cv-sheet h4 {
+  font-size: 0.82em;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cv-red);
+  margin: 1.6em 0 0.6em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid #dfe5ee;
+}
+.cv-side h4:first-child,
+.cv-main section:first-child h4 {
+  margin-top: 0;
+}
+.cv-list li {
+  margin-bottom: 0.35em;
+}
+.cv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+.cv-tags span {
+  background: #fff;
+  border: 1px solid #dfe5ee;
+  border-radius: 0.4em;
+  padding: 0.15em 0.55em;
+  font-size: 0.92em;
+}
+.cv-main p {
+  color: #3b4a5e;
+}
+.cv-item {
+  margin-bottom: 1em;
+}
+.cv-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  color: var(--cv-navy);
+}
+.cv-item-top span {
+  color: #6b7a8f;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.cv-sub {
+  font-size: 0.92em;
+  font-weight: 600;
+  color: #6b7a8f !important;
+}
+.cv-main ul {
+  margin-top: 0.35em;
+  padding-inline-start: 1.1em;
+  list-style: disc;
+  color: #3b4a5e;
+}
+.cv-main ul li::marker {
+  color: var(--cv-red);
+}
+.cv-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.8em 2.4em;
+  border-top: 1px solid #dfe5ee;
+  font-size: 0.72em;
+  color: #8592a6;
+}
+.cv-foot img {
+  height: 1.6em;
+  width: auto;
+}
+
+/* Download PDF = print only the CV, on one A4 page */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  #cv-sheet,
+  #cv-sheet * {
+    visibility: visible !important;
+  }
+  #cv-sheet {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 210mm;
+    height: 297mm;
+    font-size: 10.2pt;
+    aspect-ratio: auto;
+  }
+  #intro,
+  .lenis {
+    overflow: visible !important;
+  }
 }

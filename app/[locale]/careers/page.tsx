@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
@@ -25,6 +26,10 @@ export default async function Careers({ params }: P) {
             <div className="rounded-2xl border-s-4 border-brand bg-brand-soft p-6">
               <ShieldCheck className="mb-3 h-8 w-8 text-brand" strokeWidth={1.5} />
               <p className="font-bold leading-relaxed text-fg">{t("cFree")}</p>
+            </div>
+            <div className="card space-y-3 p-6">
+              <Link href={href(l, "jobs")} className="btn-brand w-full">{t("navJobs")}</Link>
+              <Link href={href(l, "cv")} className="btn-outline w-full">{t("navCv")}</Link>
             </div>
             <div className="card p-6 text-sm leading-relaxed text-muted">
               <p className="mb-2 font-bold text-fg">{t("email")}</p>

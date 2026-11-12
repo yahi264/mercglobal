@@ -15,6 +15,8 @@ export function navItems(l: Locale): NavItem[] {
         { href: href(l, "about"), label: t("navAbout") },
         { href: href(l, "certificates"), label: t("navCertificates") },
         { href: href(l, "references"), label: t("navReferences") },
+        { href: href(l, "jobs"), label: t("navJobs") },
+        { href: href(l, "cv"), label: t("navCv") },
         { href: href(l, "careers"), label: t("navCareers") },
       ],
     },

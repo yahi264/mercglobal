@@ -14,7 +14,7 @@ import { href, navItems } from "@/lib/nav";
 import { asset } from "@/lib/asset";
 
 const manrope = Manrope({ subsets: ["latin", "latin-ext", "cyrillic"], weight: ["400", "500", "600", "700", "800"], variable: "--font-manrope" });
-const tinos = Tinos({ subsets: ["latin", "latin-ext"], weight: ["700"], variable: "--font-logo" });
+const tinos = Tinos({ subsets: ["latin", "latin-ext", "cyrillic"], weight: ["700"], variable: "--font-logo" });
 const cairo = Cairo({ subsets: ["arabic", "latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-cairo" });
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
@@ -55,7 +55,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: themeScript + introScript }} />
       </head>
       <body>
-        <Intro tagline={text.heroEyebrow[l]} skip={t("skipIntro")} />
+        <Intro tagline={text.heroEyebrow[l]} skip={t("skipIntro")} locale={l} />
         <SmoothScroll />
         <ScrollProgress />
         <Header

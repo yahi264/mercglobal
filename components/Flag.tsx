@@ -42,6 +42,33 @@ export function Flag({ locale, className = "h-3.5 w-5" }: { locale: Locale; clas
           <path fill="#FF0000" d="M0 0h3v6H0z" />
         </svg>
       );
+    case "de":
+      return (
+        <svg viewBox="0 0 5 3" preserveAspectRatio="none" {...common}>
+          <path fill="#000" d="M0 0h5v1H0z" />
+          <path fill="#DD0000" d="M0 1h5v1H0z" />
+          <path fill="#FFCE00" d="M0 2h5v1H0z" />
+        </svg>
+      );
+    case "es":
+      return (
+        <svg viewBox="0 0 750 500" preserveAspectRatio="none" {...common}>
+          <path fill="#AA151B" d="M0 0h750v500H0z" />
+          <path fill="#F1BF00" d="M0 125h750v250H0z" />
+          <rect x="170" y="200" width="70" height="100" rx="10" fill="#AA151B" opacity="0.85" />
+        </svg>
+      );
+    case "zh":
+      return (
+        <svg viewBox="0 0 30 20" preserveAspectRatio="none" {...common}>
+          <path fill="#EE1C25" d="M0 0h30v20H0z" />
+          <path fill="#FFFF00" d="M5 2l1.18 3.62H10L6.91 7.86 8.09 11.5 5 9.26 1.91 11.5 3.09 7.86 0 5.62h3.82z" />
+          <circle cx="10" cy="2" r="0.9" fill="#FFFF00" />
+          <circle cx="12" cy="4" r="0.9" fill="#FFFF00" />
+          <circle cx="12" cy="7" r="0.9" fill="#FFFF00" />
+          <circle cx="10" cy="9" r="0.9" fill="#FFFF00" />
+        </svg>
+      );
     case "ru":
       return (
         <svg viewBox="0 0 9 6" preserveAspectRatio="none" {...common}>
