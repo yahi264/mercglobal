@@ -22,7 +22,6 @@ export default async function CvPage({ params }: P) {
           defaultLang={l === "tr" ? "tr" : "en"}
           email={company.emails[0]}
           whatsapp={company.whatsapp[0].number}
-          endpoint={company.cvEndpoint}
           ui={{
             language: t("cvLanguage"),
             example: t("cvExample"),

@@ -15,7 +15,7 @@ export default function AdminPage() {
           <Link href="/en/jobs/" className="text-sm font-semibold text-brand">View on the website · Sitede gör →</Link>
         </div>
       </header>
-      <AdminJobs sectors={sectors.map((s) => ({ slug: s.slug, title: `${s.title.en} · ${s.title.tr}` }))} />
+      <AdminJobs siteJobsHref="/mercglobal/en/jobs/" sectors={sectors.map((s) => ({ slug: s.slug, title: `${s.title.en} · ${s.title.tr}` }))} />
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Download, FileText, Loader2, Mail, Plus, RotateCcw, Send, Trash2, Upload, AlertCircle } from "lucide-react";
 import { asset } from "@/lib/asset";
 import { WhatsAppIcon } from "./Icons";
+import { sendApplication } from "@/lib/send";
 
 // Online CV builder for job seekers. The CV is written in English or Turkish (the candidate chooses),
 // shown live in a clean A4 layout and saved only in the visitor's browser. "Send" turns the CV into a
@@ -105,7 +106,7 @@ type UiLabels = {
   needContact: string; other: string; email: string; whatsapp: string; saved: string; preview: string; message: string; messageHint: string;
 };
 
-export function CvBuilder({ ui, email, whatsapp, endpoint, defaultLang }: { ui: UiLabels; email: string; whatsapp: string; endpoint: string; defaultLang: CvLang }) {
+export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; email: string; whatsapp: string; defaultLang: CvLang }) {
   const [cv, setCv] = useState<Cv>(() => blank(defaultLang));
   const [loaded, setLoaded] = useState(false);
   const [status, setStatus] = useState<"idle" | "pdf" | "sending" | "ok" | "fail" | "need">("idle");
@@ -245,27 +246,17 @@ export function CvBuilder({ ui, email, whatsapp, endpoint, defaultLang }: { ui: 
   const sendNow = async () => {
     if (!cv.name.trim() || !(cv.email.trim() || cv.phone.trim())) return setStatus("need");
     setStatus("sending");
+    let pdf: File | null = null;
     try {
-      const fd = new FormData();
-      fd.append("_subject", subject);
-      fd.append("_template", "box");
-      fd.append("_captcha", "false");
-      if (cv.email.trim()) fd.append("_replyto", cv.email.trim());
-      fd.append("Name", cv.name);
-      fd.append("Position", cv.title);
-      fd.append("Email", cv.email);
-      fd.append("Phone", cv.phone);
-      fd.append("Message", cv.message || "—");
-      fd.append("CV", asText());
-      try {
-        fd.append("attachment", new File([await makePdf()], fileName, { type: "application/pdf" }));
-      } catch {}
-      const r = await fetch(endpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } });
-      const j = await r.json().catch(() => ({}));
-      setStatus(r.ok && String(j.success) === "true" ? "ok" : "fail");
-    } catch {
-      setStatus("fail");
-    }
+      pdf = new File([await makePdf()], fileName, { type: "application/pdf" });
+    } catch {}
+    const role = cv.title.trim() || "General application";
+    const ok = await sendApplication(
+      `Job application — ${role} — ${cv.name.trim()} (CV builder)`,
+      { Position: role, Name: cv.name, Email: cv.email, Phone: cv.phone, Message: cv.message, CV: asText(), "Sent from": `${location.origin}${location.pathname}` },
+      pdf,
+    );
+    setStatus(ok ? "ok" : "fail");
   };
   const sendMail = () => {
     const body = (cv.message ? cv.message + "\n\n" : "") + asText();
