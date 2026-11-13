@@ -8,7 +8,7 @@ import { ChevronDown, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { LanguageRow, LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
-import { WhatsAppIcon } from "./Icons";
+import { LinkedInIcon, WhatsAppIcon } from "./Icons";
 import { Logo } from "./Logo";
 
 export type NavLink = { href: string; label: string };
@@ -19,7 +19,7 @@ type Props = {
   items: NavItem[];
   cta: NavLink;
   labels: { menuOpen: string; menuClose: string; language: string; dark: string; light: string; home: string };
-  contact: { phone: string; phoneHref: string; emails: string[]; city: string; whatsapp: string };
+  contact: { phone: string; phoneHref: string; emails: string[]; city: string; whatsapp: string; linkedin: string };
 };
 
 export function Header({ locale, items, cta, labels, contact }: Props) {
@@ -110,15 +110,20 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
               <MapPin className="h-3.5 w-3.5 text-brand" /> {contact.city}
             </span>
           </div>
-          <a
-            href={`https://wa.me/${contact.whatsapp}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 transition-colors hover:text-white"
-            aria-label="WhatsApp"
-          >
-            <WhatsAppIcon className="h-4 w-4 text-whatsapp" /> WhatsApp
-          </a>
+          <div className="flex items-center gap-5">
+            <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors hover:text-white" aria-label="LinkedIn">
+              <LinkedInIcon className="h-3.5 w-3.5 text-[#4c9be8]" /> LinkedIn
+            </a>
+            <a
+              href={`https://wa.me/${contact.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 transition-colors hover:text-white"
+              aria-label="WhatsApp"
+            >
+              <WhatsAppIcon className="h-4 w-4 text-whatsapp" /> WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 

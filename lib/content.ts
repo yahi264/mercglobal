@@ -14,6 +14,7 @@ export const company = {
   ],
   emails: ["info@mercglobal.com.tr", "ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com"],
   emergencyEmail: "merc_ltd@hotmail.com",
+  linkedin: "https://www.linkedin.com/company/merc-recruitment-services-ltd/",
   // shown in the top bar of every page
   topEmails: ["info@turkishmanpower.com", "umut@turkishmanpower.com"],
   websites: ["www.mercglobal.com.tr", "www.turkishmanpower.com", "www.balkanmanpower.com", "www.turkische-arbeitskrafte.com", "www.yurtdisiisler.com", "www.yabancieleman.com.tr"],

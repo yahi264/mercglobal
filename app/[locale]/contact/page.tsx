@@ -3,7 +3,7 @@ import { Globe, Mail, MapPin, Phone, Smartphone } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "@/components/Forms";
-import { WhatsAppIcon } from "@/components/Icons";
+import { LinkedInIcon, WhatsAppIcon } from "@/components/Icons";
 import { company, sectors } from "@/lib/content";
 import { getT, type Locale } from "@/lib/i18n";
 import { href } from "@/lib/nav";
@@ -74,6 +74,9 @@ export default async function Contact({ params }: P) {
               {company.websites.map((w) => (
                 <a key={w} href={`https://${w}`} target="_blank" rel="noopener noreferrer" className={link}>{w}</a>
               ))}
+              <a href={company.linkedin} target="_blank" rel="noopener noreferrer" className={`${link} mt-2 inline-flex items-center gap-2`}>
+                <LinkedInIcon className="h-4 w-4 text-[#0a66c2]" /> LinkedIn
+              </a>
             </div>
           </Reveal>
         </div>

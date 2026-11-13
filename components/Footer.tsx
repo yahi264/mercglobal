@@ -4,7 +4,7 @@ import { company, mainWhatsApp, text } from "@/lib/content";
 import { getT, type Locale } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import { asset } from "@/lib/asset";
-import { WhatsAppIcon } from "./Icons";
+import { LinkedInIcon, WhatsAppIcon } from "./Icons";
 import { LanguageRow } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 
@@ -37,6 +37,14 @@ export function Footer({ locale: l }: { locale: Locale }) {
           <p className="leading-relaxed">{text.tagline[l]}</p>
           <div className="mt-6 text-white">
             <LanguageRow locale={l} />
+          </div>
+          <div className="mt-6 flex gap-3">
+            <a href={company.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-[#0a66c2]">
+              <LinkedInIcon className="h-4 w-4" />
+            </a>
+            <a href={`https://wa.me/${mainWhatsApp}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-whatsapp">
+              <WhatsAppIcon className="h-4 w-4" />
+            </a>
           </div>
         </div>
 
