@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Briefcase, CheckCircle2, FileText, Globe2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Briefcase, CheckCircle2, FileText, Globe2, UploadCloud } from "lucide-react";
 import { HeroSlider } from "@/components/HeroSlider";
 import { CtaBand, SectorCard, ServiceCard } from "@/components/Blocks";
 import { SectionHeading } from "@/components/PageHero";
@@ -62,11 +62,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 <p className="mt-2 max-w-2xl text-muted">{t("lookingJobText")}</p>
               </div>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Link href={href(l, "jobs")} className="btn-brand glow-btn">
+            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap lg:flex-nowrap">
+              <Link href={href(l, "jobs")} className="btn-brand glow-btn whitespace-nowrap">
                 <span className="live-dot !bg-white before:!bg-white" aria-hidden /> {t("navJobs")} <ArrowRight className="flip-rtl h-4 w-4" />
               </Link>
-              <Link href={href(l, "cv")} className="btn-outline">
+              <Link href={`${href(l, "careers")}?general=1#apply`} className="btn-outline whitespace-nowrap">
+                <UploadCloud className="h-4 w-4" /> {t("sendCv")}
+              </Link>
+              <Link href={href(l, "cv")} className="btn-outline whitespace-nowrap">
                 <FileText className="h-4 w-4" /> {t("navCv")}
               </Link>
             </div>

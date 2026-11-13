@@ -35,7 +35,9 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
 
   // the role comes from the vacancy the visitor clicked (?position=…)
   useEffect(() => {
-    const p = new URLSearchParams(location.search).get("position");
+    const q = new URLSearchParams(location.search);
+    const p = q.get("position");
+    if (q.get("general")) setLocked(true); // "Send your CV" from the home page: general application
     if (p) {
       setPosition(p);
       setLocked(true);
@@ -113,7 +115,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
           <span className={lab}>{t.position}</span>
           {locked ? (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brand/40 bg-brand-soft px-4 py-3">
-              <span className="flex-1 font-bold text-brand">{position}</span>
+              <span className="flex-1 font-bold text-brand">{role}</span>
               <button type="button" onClick={() => setLocked(false)} className="text-xs font-semibold text-muted underline hover:text-brand">
                 {t.change}
               </button>
