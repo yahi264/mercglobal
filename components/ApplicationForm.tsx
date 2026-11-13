@@ -56,6 +56,15 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
   }, [locale]);
 
   const role = position || t.general;
+  // the CV builder always gets the job chosen here (also from the sidebar link and after a reload)
+  const cvLink = position ? `${cvHref}?position=${encodeURIComponent(position)}` : cvHref;
+  useEffect(() => {
+    const u = new URL(location.href);
+    if (position) u.searchParams.set("position", position);
+    else u.searchParams.delete("position");
+    history.replaceState(history.state, "", u);
+    window.dispatchEvent(new CustomEvent("mg:position", { detail: position }));
+  }, [position]);
   const pick = (f?: File | null) => {
     if (!f) return;
     if (!okFile(f)) {
@@ -166,7 +175,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
             <span className="flex items-center justify-center gap-2 rounded-lg bg-card px-3 py-2.5 text-sm font-bold text-brand shadow-sm">
               <UploadCloud className="h-4 w-4" /> {t.uploadTab}
             </span>
-            <Link href={`${cvHref}?position=${encodeURIComponent(role)}`} className="flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-fg transition-colors hover:bg-card hover:text-brand">
+            <Link href={cvLink} className="flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-fg transition-colors hover:bg-card hover:text-brand">
               <FileText className="h-4 w-4" /> {t.createTab}
             </Link>
           </div>
@@ -198,7 +207,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
           <input ref={input} type="file" hidden accept=".pdf,.doc,.docx,.odt,.rtf,.jpg,.jpeg,.png,.webp,.heic,application/pdf,image/*" onChange={(e) => pick(e.target.files?.[0])} />
           <p className="mt-2 text-xs text-muted">
             {t.createHint}{" "}
-            <Link href={`${cvHref}?position=${encodeURIComponent(role)}`} className="font-semibold text-brand hover:underline">{t.createTab} →</Link>
+            <Link href={cvLink} className="font-semibold text-brand hover:underline">{t.createTab} →</Link>
           </p>
         </div>
 

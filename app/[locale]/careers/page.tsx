@@ -4,6 +4,7 @@ import { Briefcase, FileText, ShieldCheck } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { ApplicationForm } from "@/components/ApplicationForm";
+import { CvLink } from "@/components/CvLink";
 import { company } from "@/lib/content";
 import { getT, type Locale } from "@/lib/i18n";
 import { href } from "@/lib/nav";
@@ -49,9 +50,9 @@ export default async function Careers({ params }: P) {
             <Link href={href(l, "jobs")} className="btn-brand glow-btn w-full">
               <Briefcase className="h-4 w-4" /> {t("navJobs")}
             </Link>
-            <Link href={href(l, "cv")} className="btn-outline w-full">
+            <CvLink href={href(l, "cv")} className="btn-outline w-full">
               <FileText className="h-4 w-4" /> {t("navCv")}
-            </Link>
+            </CvLink>
           </div>
         </Reveal>
       </section>
