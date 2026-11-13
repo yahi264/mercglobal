@@ -260,8 +260,29 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
     } catch {}
     const role = applyFor || cv.title.trim() || "General application";
     const ok = await sendApplication(
-      `Job application — ${role} — ${cv.name.trim()} (CV created on the website)`,
-      { Position: role, Name: cv.name, Email: cv.email, Phone: cv.phone, Message: cv.message, CV: asText(), "Sent from": `${location.origin}${location.pathname}` },
+      {
+        role,
+        name: cv.name.trim(),
+        email: cv.email.trim(),
+        phone: cv.phone.trim(),
+        country: [cv.city, cv.country].filter(Boolean).join(", "),
+        nationality: cv.nationality,
+        message: cv.message,
+        cvText: asText(),
+        cv: {
+          title: cv.title,
+          summary: cv.summary,
+          skills: cv.skills,
+          birth: fmtDay(cv.birth, cv.lang),
+          licence: cv.licence,
+          experience: cv.experience
+            .filter((e) => e.role || e.company)
+            .map((e) => ({ role: e.role, company: e.company, place: [e.city, e.country].filter(Boolean).join(", "), period: period(e.from, e.to, e.current), duties: e.duties })),
+          education: cv.education.filter((e) => e.school).map((e) => ({ school: e.school, degree: e.degree, period: period(e.from, e.to) })),
+          languages: cv.languages.filter((x) => x.name),
+          certificates: cv.certificates.filter((x) => x.name),
+        },
+      },
       pdf,
     );
     if (ok) {

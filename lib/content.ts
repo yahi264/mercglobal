@@ -20,6 +20,8 @@ export const company = {
   // CV builder "Send": FormSubmit (formsubmit.co) forwards submissions to this mailbox. The very first
   // submission makes FormSubmit email an activation link to the address — click it once.
   cvEndpoint: "https://formsubmit.co/ajax/info@mercglobal.com.tr",
+  // Branded mailer on the company Google account (scripts/apps-script/Code.gs). Empty = FormSubmit only.
+  applyEndpoint: "",
   // Every application / CV is also copied to these company addresses.
   applyCc: ["ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com", "cv@turkishmanpower.com"],
   mapLink: "https://www.google.com/maps/search/?api=1&query=Mer%C3%A7+Global+Group+Ankara",

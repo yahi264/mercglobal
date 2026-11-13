@@ -73,17 +73,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
     setError("");
     setStatus("sending");
     const ok = await sendApplication(
-      `Job application — ${role} — ${v.name.trim()}`,
-      {
-        Position: role,
-        Name: v.name.trim(),
-        Email: v.email.trim(),
-        Phone: v.phone.trim(),
-        "Country of residence": v.country,
-        Nationality: v.nationality,
-        Message: v.message,
-        "Sent from": `${location.origin}${location.pathname} (${locale})`,
-      },
+      { role, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), country: v.country, nationality: v.nationality, message: v.message },
       file,
     );
     setStatus(ok ? "ok" : "fail");
