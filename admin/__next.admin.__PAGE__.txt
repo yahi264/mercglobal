@@ -1,0 +1,32 @@
+1:"$Sreact.fragment"
+2:"/mercglobal/_next/static/chunks/42onvq6nokjl2.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+b:"/mercglobal/_next/static/chunks/03_rtbf96xg6g.js"
+c:"/mercglobal/_next/static/chunks/20pgy96yena60.js"
+d:I[23091,["$b","$c"],"Logo"]
+e:I[22016,["$b","$c"],""]
+f:I[95154,["$b","$c"],"AdminJobs"]
+10:I[97367,["$2"],"OutletBoundary"]
+11:"$Sreact.suspense"
+14:"ViewportBoundary"
+15:I[97367,["$2"],"$14"]
+16:"MetadataBoundary"
+17:I[97367,["$2"],"$16"]
+:HL["/mercglobal/_next/static/chunks/2yqysrk7ixkd5.css","style"]
+:HL["/mercglobal/_next/static/chunks/2-wpyktx7g6f5.css","style"]
+6:X
+6:C
+7:X
+a:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","main",null,{"className":"container-x py-10","children":[["$","header",null,{"className":"mb-8 flex flex-wrap items-center justify-between gap-4","children":[["$","div",null,{"className":"min-w-0 max-w-full flex-1","children":["$","$Ld",null,{"locale":"tr","fit":true,"className":"[--lh:40px]"}]}],["$","div",null,{"className":"sm:text-end","children":[["$","h1",null,{"className":"text-2xl font-extrabold text-fg","children":"Job vacancies · İş ilanları"}],["$","$Le",null,{"href":"/en/jobs/","className":"text-sm font-semibold text-brand","children":"View on the website · Sitede gör →"}]]}]]}],["$","$Lf",null,{"siteJobsHref":"/mercglobal/en/jobs/","sectors":[{"slug":"oil-gas","title":"Oil & Natural Gas · Petrol & Doğal Gaz"},{"slug":"energy-power","title":"Energy & Power · Enerji ve Güç"},{"slug":"construction-infrastructure","title":"Construction & Infrastructure · İnşaat ve Altyapı"},{"slug":"offshore-marine-dredging","title":"Offshore, Marine & Dredging · Offshore, Marine ve Dredging"},{"slug":"agriculture-livestock","title":"Agriculture & Livestock · Tarım ve Hayvancılık"},{"slug":"logistics-transport","title":"Logistics & Transport · Lojistik ve Taşımacılık"},{"slug":"manufacturing-industry","title":"Manufacturing & Industry · İmalat ve Sanayi"},{"slug":"tourism-hospitality","title":"Tourism & Hospitality · Turizm ve Hizmet Sektörü"},{"slug":"aviation-defence","title":"Aviation & Defence Industry · Havacılık ve Savunma Sanayii"}]}]]}],[["$","script","script-0",{"src":"/mercglobal/_next/static/chunks/03_rtbf96xg6g.js","async":true}],["$","script","script-1",{"src":"/mercglobal/_next/static/chunks/20pgy96yena60.js","async":true}]],["$","$L10",null,{"children":["$","$11",null,{"name":"Next.MetadataOutlet","children":"$@12"}]}]]}],"p":"$@13","v":null,"s":"$7"}}]]
+8:[["children",{"s":"admin","h":112,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/mercglobal/_next/static/chunks/2yqysrk7ixkd5.css","precedence":"next"}],["$","link","1",{"rel":"stylesheet","href":"/mercglobal/_next/static/chunks/2-wpyktx7g6f5.css","precedence":"next"}]],["$","html",null,{"lang":"en","className":"_1yDBpa_variable V0tXeq_variable","suppressHydrationWarning":true,"children":[["$","head",null,{"children":["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var t=localStorage.getItem(\"merc-theme\");if(!t){t=matchMedia(\"(prefers-color-scheme: dark)\").matches?\"dark\":\"light\"}if(t===\"dark\")document.documentElement.classList.add(\"dark\")}catch(e){}})();"}}]}],["$","body",null,{"className":"min-h-screen bg-page-2","children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]]}]]}],"p":"$@9","v":null,"s":"$7"},"c":"$Qa"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]]}],"p":"$@5","v":"$6","s":"$7"},"c":"$Q8"},"h":{"r":["$","$1","h",{"children":[null,["$","$L15",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L17",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$11",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Admin · Merc Global"}],["$","meta","1",{"name":"robots","content":"noindex, nofollow"}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@18","v":null,"s":"$7"}},"a":"$@19","u":"$@1a","b":"UVfTMhJbgpJxLgwdqGYLv"}
+12:null
+7:300
+1a:true
+7:C
+19:0
+9:"$undefined"
+5:"$undefined"
+18:"$undefined"
+13:"$undefined"
