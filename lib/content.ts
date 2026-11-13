@@ -21,7 +21,7 @@ export const company = {
   // submission makes FormSubmit email an activation link to the address — click it once.
   cvEndpoint: "https://formsubmit.co/ajax/info@mercglobal.com.tr",
   // Every application / CV is also copied to these company addresses.
-  applyCc: ["ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com"],
+  applyCc: ["ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com", "cv@turkishmanpower.com"],
   mapLink: "https://www.google.com/maps/search/?api=1&query=Mer%C3%A7+Global+Group+Ankara",
   licenceNo: "494",
   licenceDate: "22/09/2011",

@@ -104,12 +104,17 @@ const fmtMonth = (s: string, lang: CvLang) =>
 type UiLabels = {
   language: string; example: string; clear: string; download: string; sendNow: string; sending: string; sentOk: string; sentFail: string;
   needContact: string; other: string; email: string; whatsapp: string; saved: string; preview: string; message: string; messageHint: string;
+  applyingFor: string; applyHint: string; justCreate: string; applyNow: string; sendGeneral: string; downloadMine: string;
+  successTitle: string; successText: string; backJobs: string; jobsHref: string;
 };
 
 export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; email: string; whatsapp: string; defaultLang: CvLang }) {
   const [cv, setCv] = useState<Cv>(() => blank(defaultLang));
   const [loaded, setLoaded] = useState(false);
   const [status, setStatus] = useState<"idle" | "pdf" | "sending" | "ok" | "fail" | "need">("idle");
+  // "Apply mode": the visitor came from a vacancy — the CV they build is sent as their application for it
+  const [applyFor, setApplyFor] = useState("");
+  const [sentRole, setSentRole] = useState("");
   const t = L[cv.lang];
   const file = useRef<HTMLInputElement>(null);
 
@@ -133,7 +138,10 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
       }
     } catch {}
     const pos = new URLSearchParams(location.search).get("position");
-    if (pos) next.title = pos;
+    if (pos) {
+      next.title = pos;
+      setApplyFor(pos);
+    }
     setCv(next);
     setLoaded(true);
   }, [defaultLang]);
@@ -244,18 +252,22 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
   };
 
   const sendNow = async () => {
-    if (!cv.name.trim() || !(cv.email.trim() || cv.phone.trim())) return setStatus("need");
+    if (!cv.name.trim() || !cv.email.trim() || !cv.phone.trim()) return setStatus("need");
     setStatus("sending");
     let pdf: File | null = null;
     try {
       pdf = new File([await makePdf()], fileName, { type: "application/pdf" });
     } catch {}
-    const role = cv.title.trim() || "General application";
+    const role = applyFor || cv.title.trim() || "General application";
     const ok = await sendApplication(
-      `Job application — ${role} — ${cv.name.trim()} (CV builder)`,
+      `Job application — ${role} — ${cv.name.trim()} (CV created on the website)`,
       { Position: role, Name: cv.name, Email: cv.email, Phone: cv.phone, Message: cv.message, CV: asText(), "Sent from": `${location.origin}${location.pathname}` },
       pdf,
     );
+    if (ok) {
+      setSentRole(role);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     setStatus(ok ? "ok" : "fail");
   };
   const sendMail = () => {
@@ -279,7 +291,34 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
   const cer = cv.certificates.filter((x) => x.name);
   const busy = status === "sending" || status === "pdf";
 
+  if (status === "ok")
+    return (
+      <div className="card mx-auto flex max-w-2xl flex-col items-center gap-4 p-8 text-center sm:p-12" role="status">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-whatsapp/15 text-[#128c7e]">
+          <CheckCircle2 className="h-9 w-9" />
+        </span>
+        <h2 className="text-2xl font-extrabold text-fg">{ui.successTitle}</h2>
+        <p className="max-w-lg text-muted">{ui.successText.replace("{position}", sentRole)}</p>
+        <div className="mt-2 flex flex-wrap justify-center gap-3">
+          <button type="button" onClick={download} className="btn-outline"><Download className="h-4 w-4" /> {ui.downloadMine}</button>
+          <a href={ui.jobsHref} className="btn-brand">{ui.backJobs}</a>
+        </div>
+      </div>
+    );
+
   return (
+    <div className="space-y-6">
+    {applyFor && (
+      <div className="card flex flex-col gap-3 border-2 !border-brand/50 p-5 sm:flex-row sm:items-center">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-white"><Send className="flip-rtl h-5 w-5" /></span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-brand">{ui.applyingFor}</p>
+          <p className="text-lg font-extrabold text-fg">{applyFor}</p>
+          <p className="mt-1 text-sm text-muted">{ui.applyHint}</p>
+        </div>
+        <button type="button" onClick={() => setApplyFor("")} className="shrink-0 text-xs font-semibold text-muted underline hover:text-brand">{ui.justCreate}</button>
+      </div>
+    )}
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <datalist id={listId}>
         {countries.map((c) => <option key={c} value={c} />)}
@@ -418,16 +457,28 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
             <span className="mb-1 block text-sm font-bold text-fg">{ui.message}</span>
             <textarea className="field !py-2.5" rows={3} value={cv.message} placeholder={ui.messageHint} onChange={(e) => set("message", e.target.value)} />
           </label>
-          <button type="button" onClick={sendNow} disabled={busy} className="btn-brand w-full">
-            {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="flip-rtl h-4 w-4" />} {status === "sending" ? ui.sending : ui.sendNow}
-          </button>
-          {status === "ok" && <p className="flex gap-2 rounded-xl bg-whatsapp/10 px-4 py-3 text-sm font-medium text-[#128c7e] dark:text-whatsapp"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {ui.sentOk}</p>}
+          {applyFor ? (
+            <button type="button" onClick={sendNow} disabled={busy} className="btn-brand w-full !py-3.5 text-base">
+              {status === "sending" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="flip-rtl h-5 w-5" />} {status === "sending" ? ui.sending : ui.applyNow}
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={download} disabled={busy} className="btn-brand w-full !py-3.5 text-base">
+                {status === "pdf" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />} {ui.downloadMine}
+              </button>
+              <button type="button" onClick={sendNow} disabled={busy} className="btn-outline w-full">
+                {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="flip-rtl h-4 w-4" />} {status === "sending" ? ui.sending : ui.sendGeneral}
+              </button>
+            </>
+          )}
           {status === "fail" && <p className="flex gap-2 rounded-xl bg-brand-soft px-4 py-3 text-sm font-medium text-brand"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {ui.sentFail}</p>}
           {status === "need" && <p className="flex gap-2 rounded-xl bg-brand-soft px-4 py-3 text-sm font-medium text-brand"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {ui.needContact}</p>}
           <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
-            <button type="button" onClick={download} disabled={busy} className="btn-outline flex-1 !px-3 !py-2 text-xs">
-              {status === "pdf" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} {ui.download}
-            </button>
+            {applyFor && (
+              <button type="button" onClick={download} disabled={busy} className="btn-outline flex-1 !px-3 !py-2 text-xs">
+                {status === "pdf" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} {ui.download}
+              </button>
+            )}
             <span className="text-xs text-muted">{ui.other}:</span>
             <button type="button" onClick={sendMail} className="btn-outline !px-3 !py-2" aria-label={ui.email} title={ui.email}><Mail className="h-4 w-4" /></button>
             <button type="button" onClick={sendWa} className="btn-wa !px-3 !py-2" aria-label={ui.whatsapp} title={ui.whatsapp}><WhatsAppIcon className="h-4 w-4" /></button>
@@ -528,6 +579,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
           </article>
         </div>
       </div>
+    </div>
     </div>
   );
 }

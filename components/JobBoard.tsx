@@ -9,7 +9,7 @@ import { localeNames, type Locale } from "@/lib/i18n";
 
 type Labels = Record<
   | "search" | "all" | "none" | "loading" | "error" | "count" | "location" | "positions" | "type" | "salary"
-  | "deadline" | "posted" | "requirements" | "description" | "apply" | "cv" | "writtenIn" | "close" | "other",
+  | "deadline" | "posted" | "requirements" | "description" | "apply" | "cv" | "writtenIn" | "close" | "other" | "createApply",
   string
 >;
 
@@ -224,7 +224,7 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
                   {labels.apply}
                 </Link>
                 <Link href={withJob(cvHref, open)} className="btn-outline flex-1">
-                  <FileText className="h-4 w-4" /> {labels.cv}
+                  <FileText className="h-4 w-4" /> {labels.createApply}
                 </Link>
               </div>
             </motion.div>

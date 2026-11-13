@@ -52,6 +52,7 @@ export default async function Jobs({ params }: P) {
             writtenIn: t("jobWrittenIn"),
             close: t("close"),
             other: t("fOther"),
+            createApply: t("jobCreateApply"),
           }}
         />
         <p className="mt-10 text-center text-sm font-semibold text-muted">{t("cFree")}</p>

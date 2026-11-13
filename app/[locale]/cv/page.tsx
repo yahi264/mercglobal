@@ -39,6 +39,16 @@ export default async function CvPage({ params }: P) {
             preview: t("cvPreview"),
             message: t("cvMessage"),
             messageHint: t("cvMessageHint"),
+            applyingFor: t("cvApplyingFor"),
+            applyHint: t("cvApplyHint"),
+            justCreate: t("cvJustCreate"),
+            applyNow: t("cvApplyNow"),
+            sendGeneral: t("cvSendGeneral"),
+            downloadMine: t("cvDownloadMine"),
+            successTitle: t("apSuccessTitle"),
+            successText: t("apSuccessText"),
+            backJobs: t("apBackJobs"),
+            jobsHref: href(l, "jobs"),
           }}
         />
         <p className="mt-10 text-center text-sm font-semibold text-muted">{t("cFree")}</p>

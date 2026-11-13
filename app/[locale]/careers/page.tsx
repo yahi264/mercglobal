@@ -36,7 +36,7 @@ export default async function Careers({ params }: P) {
               upload: t("apUpload"), choose: t("apChoose"), uploadHint: t("apUploadHint"), noCv: t("apNoCv"), send: t("apSend"), sending: t("apSending"),
               successTitle: t("apSuccessTitle"), successText: t("apSuccessText"), another: t("apAnother"), needFile: t("apNeedFile"),
               fileBad: t("apFileBad"), fail: t("apFail"), required: t("fRequired"), badEmail: t("fBadEmail"), consent: t("apConsent"),
-              orEmail: t("fSendEmail"), orWhatsApp: t("fSendWhatsApp"),
+              orEmail: t("fSendEmail"), orWhatsApp: t("fSendWhatsApp"), uploadTab: t("apUploadTab"), createTab: t("apCreateTab"), createHint: t("apCreateHint"),
             }}
           />
         </Reveal>

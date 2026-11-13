@@ -14,7 +14,7 @@ import { WhatsAppIcon } from "./Icons";
 type L = Record<
   | "title" | "intro" | "name" | "email" | "phone" | "country" | "nationality" | "position" | "general" | "change" | "message"
   | "upload" | "choose" | "uploadHint" | "noCv" | "send" | "sending" | "successTitle" | "successText" | "another" | "needFile"
-  | "fileBad" | "fail" | "required" | "badEmail" | "consent" | "orEmail" | "orWhatsApp",
+  | "fileBad" | "fail" | "required" | "badEmail" | "consent" | "orEmail" | "orWhatsApp" | "uploadTab" | "createTab" | "createHint",
   string
 >;
 
@@ -167,9 +167,17 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
           {countries.map((c) => <option key={c} value={c} />)}
         </datalist>
 
-        {/* CV upload (click or drag & drop) */}
+        {/* CV: upload an existing one, or create one here (attached to this application automatically) */}
         <div className="sm:col-span-2">
           <span className={lab}>{t.upload} {req}</span>
+          <div className="mb-3 grid grid-cols-2 gap-1 rounded-xl bg-page-2 p-1">
+            <span className="flex items-center justify-center gap-2 rounded-lg bg-card px-3 py-2.5 text-sm font-bold text-brand shadow-sm">
+              <UploadCloud className="h-4 w-4" /> {t.uploadTab}
+            </span>
+            <Link href={`${cvHref}?position=${encodeURIComponent(role)}`} className="flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-fg transition-colors hover:bg-card hover:text-brand">
+              <FileText className="h-4 w-4" /> {t.createTab}
+            </Link>
+          </div>
           {file ? (
             <div className="flex items-center gap-3 rounded-xl border border-line bg-page-2 px-4 py-3">
               <Paperclip className="h-5 w-5 shrink-0 text-brand" />
@@ -196,9 +204,10 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
             </button>
           )}
           <input ref={input} type="file" hidden accept=".pdf,.doc,.docx,.odt,.rtf,.jpg,.jpeg,.png,.webp,.heic,application/pdf,image/*" onChange={(e) => pick(e.target.files?.[0])} />
-          <Link href={`${cvHref}${position ? `?position=${encodeURIComponent(position)}` : ""}`} className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
-            <FileText className="h-4 w-4" /> {t.noCv}
-          </Link>
+          <p className="mt-2 text-xs text-muted">
+            {t.createHint}{" "}
+            <Link href={`${cvHref}?position=${encodeURIComponent(role)}`} className="font-semibold text-brand hover:underline">{t.createTab} →</Link>
+          </p>
         </div>
 
         <label className="sm:col-span-2">
