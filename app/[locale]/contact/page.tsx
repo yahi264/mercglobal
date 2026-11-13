@@ -60,7 +60,10 @@ export default async function Contact({ params }: P) {
             <div className="min-w-0">
               <p className="mb-1 text-sm text-muted">{t("email")}</p>
               {company.emails.map((e) => (
-                <a key={e} href={`mailto:${e}`} className={`${link} break-all`}>{e}</a>
+                <a key={e} href={`mailto:${e}`} className={`${link} break-all`}>
+                  {e}
+                  {e === company.emergencyEmail && <span className="ms-2 inline-block rounded-full bg-brand-soft px-2 py-0.5 align-middle text-xs font-bold text-brand">{t("emergency")}</span>}
+                </a>
               ))}
             </div>
           </Reveal>

@@ -344,9 +344,22 @@ function Editor({ job, sectors, onCancel, onSave, saving, isNew, toast }: { job:
             {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} Upload Word / PDF / text · Dosya yükle
           </button>
           <button type="button" onClick={() => setShowPaste((s) => !s)} className="btn-outline !px-4 !py-2.5 text-sm">Paste text · Metin yapıştır</button>
-          <a href={asset("/templates/job-offer-template-EN.docx")} download className="btn-outline !px-4 !py-2.5 text-sm"><Download className="h-4 w-4" /> Template EN</a>
-          <a href={asset("/templates/is-ilani-sablonu-TR.docx")} download className="btn-outline !px-4 !py-2.5 text-sm"><Download className="h-4 w-4" /> Şablon TR</a>
           <input ref={fileRef} type="file" hidden accept=".docx,.pdf,.txt,.doc" onChange={(e) => (onFile(e.target.files?.[0]), (e.target.value = ""))} />
+        </div>
+        <div className="grid gap-2 rounded-xl bg-page-2 p-3 text-sm sm:grid-cols-2">
+          {[
+            { t: "Blank template · Boş şablon", d: "Titles only — you fill it in · Sadece başlıklar, siz doldurun", en: "/templates/job-offer-blank-EN.docx", tr: "/templates/is-ilani-bos-TR.docx" },
+            { t: "Example template · Örnek şablon", d: "Filled with a sample job · Örnek bir ilanla dolu", en: "/templates/job-offer-template-EN.docx", tr: "/templates/is-ilani-sablonu-TR.docx" },
+          ].map((x) => (
+            <div key={x.en} className="rounded-lg bg-card p-3">
+              <p className="font-bold text-fg">{x.t}</p>
+              <p className="mb-2 text-xs text-muted">{x.d}</p>
+              <div className="flex flex-wrap gap-2">
+                <a href={asset(x.en)} download className="btn-outline !px-3 !py-1.5 text-xs"><Download className="h-3.5 w-3.5" /> Word EN</a>
+                <a href={asset(x.tr)} download className="btn-outline !px-3 !py-1.5 text-xs"><Download className="h-3.5 w-3.5" /> Word TR</a>
+              </div>
+            </div>
+          ))}
         </div>
         {showPaste && (
           <div className="space-y-2">

@@ -29,10 +29,10 @@ export function Footer({ locale: l }: { locale: Locale }) {
         </div>
       </div>
 
-      <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr] lg:gap-12">
         <div>
           <div className="mb-5">
-            <Logo locale={l} tone="light" className="[--lh:40px]" />
+            <Logo locale={l} tone="light" fit className="[--lh:40px]" />
           </div>
           <p className="leading-relaxed">{text.tagline[l]}</p>
           <div className="mt-6 text-white">
@@ -84,10 +84,13 @@ export function Footer({ locale: l }: { locale: Locale }) {
                 <a href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className={link} dir="ltr">{w.display}</a>
               </li>
             ))}
-            {company.emails.slice(0, 2).map((e) => (
+            {company.emails.map((e) => (
               <li key={e} className="flex gap-3">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-                <a href={`mailto:${e}`} className={`${link} break-all`}>{e}</a>
+                <a href={`mailto:${e}`} className={`${link} break-all`}>
+                  {e}
+                  {e === company.emergencyEmail && <span className="ms-2 text-xs font-semibold text-brand">· {t("emergency")}</span>}
+                </a>
               </li>
             ))}
           </ul>

@@ -548,3 +548,18 @@ html[lang="zh"] {
   0%, 100% { box-shadow: 0 0 0 0 rgba(227, 20, 30, 0.55), 0 6px 18px rgba(227, 20, 30, 0.25); }
   50% { box-shadow: 0 0 0 8px rgba(227, 20, 30, 0), 0 6px 22px rgba(227, 20, 30, 0.45); }
 }
+
+/* CV builder: on large screens the form and the preview each scroll on their own */
+@media (min-width: 1024px) {
+  .cv-pane {
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+    max-height: calc(100svh - 7.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 10px 12px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(227 20 30 / 0.45) transparent;
+  }
+}

@@ -346,7 +346,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
       </datalist>
 
       {/* ─── Form ─── */}
-      <div className="cv-form space-y-5">
+      <div className="cv-form cv-pane space-y-5" data-lenis-prevent>
         <div className="card flex flex-wrap items-center gap-3 p-4">
           <span className="text-sm font-bold text-fg">{ui.language}:</span>
           {(["en", "tr"] as CvLang[]).map((lg) => (
@@ -472,7 +472,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
       </div>
 
       {/* ─── Send + live preview ─── */}
-      <div className="lg:sticky lg:top-24 lg:self-start">
+      <div className="cv-pane" data-lenis-prevent>
         <div className="card mb-4 space-y-3 p-4">
           <label className="block">
             <span className="mb-1 block text-sm font-bold text-fg">{ui.message}</span>

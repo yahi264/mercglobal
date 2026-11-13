@@ -34,7 +34,7 @@ const redirect = (title) => `<!doctype html><html><head><meta charset="utf-8"><t
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="${BASE}/icon.png">
 <script>
-var l=["en","tr","ar","fr","ru","de","es","zh"],p="en",s=null;
+var l=["en","tr","ar","fr","ru","de","es","zh","it"],p="en",s=null;
 try{s=localStorage.getItem("merc-lang")}catch(e){}
 if(s&&l.indexOf(s)>-1){p=s}else{var w=(navigator.languages||[navigator.language||"en"]).map(function(x){return String(x).slice(0,2).toLowerCase()});
 for(var i=0;i<w.length;i++){if(l.indexOf(w[i])>-1){p=w[i];break}}}

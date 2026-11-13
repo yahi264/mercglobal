@@ -42,6 +42,14 @@ export function Flag({ locale, className = "h-3.5 w-5" }: { locale: Locale; clas
           <path fill="#FF0000" d="M0 0h3v6H0z" />
         </svg>
       );
+    case "it":
+      return (
+        <svg viewBox="0 0 3 2" preserveAspectRatio="none" {...common}>
+          <path fill="#009246" d="M0 0h1v2H0z" />
+          <path fill="#fff" d="M1 0h1v2H1z" />
+          <path fill="#CE2B37" d="M2 0h1v2H2z" />
+        </svg>
+      );
     case "de":
       return (
         <svg viewBox="0 0 5 3" preserveAspectRatio="none" {...common}>

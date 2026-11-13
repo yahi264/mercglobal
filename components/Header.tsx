@@ -19,7 +19,7 @@ type Props = {
   items: NavItem[];
   cta: NavLink;
   labels: { menuOpen: string; menuClose: string; language: string; dark: string; light: string; home: string };
-  contact: { phone: string; phoneHref: string; email: string; city: string; whatsapp: string };
+  contact: { phone: string; phoneHref: string; emails: string[]; city: string; whatsapp: string };
 };
 
 export function Header({ locale, items, cta, labels, contact }: Props) {
@@ -101,10 +101,12 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
             <a href={contact.phoneHref} className="flex items-center gap-2 transition-colors hover:text-white">
               <Phone className="h-3.5 w-3.5 text-brand" /> <span dir="ltr">{contact.phone}</span>
             </a>
-            <a href={`mailto:${contact.email}`} className="flex items-center gap-2 transition-colors hover:text-white">
-              <Mail className="h-3.5 w-3.5 text-brand" /> {contact.email}
-            </a>
-            <span className="hidden items-center gap-2 lg:flex">
+            {contact.emails.map((e, i) => (
+              <a key={e} href={`mailto:${e}`} className={`${i ? "hidden lg:flex" : "flex"} items-center gap-2 transition-colors hover:text-white`}>
+                <Mail className="h-3.5 w-3.5 text-brand" /> {e}
+              </a>
+            ))}
+            <span className="hidden items-center gap-2 xl:flex">
               <MapPin className="h-3.5 w-3.5 text-brand" /> {contact.city}
             </span>
           </div>

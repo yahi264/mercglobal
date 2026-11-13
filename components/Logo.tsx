@@ -17,6 +17,7 @@ const TEXT: Record<Locale, [string, string]> = {
   de: ["MERÇ GLOBAL REKRUTIERUNG", "Schulungs- und Beratungsdienstleistungen Ltd."],
   es: ["MERÇ GLOBAL RECLUTAMIENTO", "Servicios de Formación y Consultoría Ltd."],
   zh: ["MERÇ GLOBAL 招聘", "培训与咨询服务有限公司"],
+  it: ["MERÇ GLOBAL RECLUTAMENTO", "Servizi di Formazione e Consulenza Ltd."],
 };
 
 export function Logo({ locale, tone = "auto", className = "", fit = false }: { locale: Locale; tone?: "auto" | "light"; className?: string; fit?: boolean }) {

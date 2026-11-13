@@ -48,7 +48,7 @@ export default async function About({ params }: P) {
               <img src={asset("/img/logo1.png")} alt="İŞKUR" width={64} height={64} className="h-16 w-16 shrink-0" />
               <div>
                 <p className="font-bold text-fg">{text.licenceShort[l]}</p>
-                <p className="text-sm text-muted" dir="ltr">No. 494 · 22/09/2011</p>
+                <p className="text-sm text-muted" dir="ltr">{t("licNo")} 494 · 22/09/2011</p>
                 <Link href={href(l, "certificates")} className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-brand">
                   {t("navCertificates")} <ArrowRight className="flip-rtl h-4 w-4" />
                 </Link>

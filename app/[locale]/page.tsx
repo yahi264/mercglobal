@@ -25,7 +25,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         badges={[
           { value: String(regions.length), label: text.stat3[l] },
           { value: String(sectors.length), label: text.stat2[l] },
-          { value: "No. 494", label: text.licenceShort[l] },
+          { value: `${t("licNo")} 494`, label: text.licenceShort[l] },
         ]}
       />
 
@@ -104,7 +104,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               <img src={asset("/img/logo1.png")} alt="İŞKUR" width={56} height={56} className="h-14 w-14 shrink-0" loading="lazy" />
               <div>
                 <p className="text-sm font-bold text-fg">{text.licenceShort[l]}</p>
-                <p className="text-xs text-muted" dir="ltr">No. 494 · 22/09/2011</p>
+                <p className="text-xs text-muted" dir="ltr">{t("licNo")} 494 · 22/09/2011</p>
               </div>
             </div>
           </Reveal>

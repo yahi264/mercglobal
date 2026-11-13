@@ -194,6 +194,7 @@ function confirmCopy(lang, name, role, ref) {
     de: ["Ihre Bewerbung ist eingegangen", "Guten Tag {name},", "vielen Dank für Ihre Bewerbung bei Merç Global für die Position: {role}.", "Unser Team prüft Ihren Lebenslauf und meldet sich, wenn Ihr Profil passt. Bitte bewahren Sie Ihre Referenznummer auf:", "Von Bewerbern wird niemals eine Gebühr verlangt.", "Mit freundlichen Grüßen\nMerç Global"],
     es: ["Hemos recibido su solicitud", "Estimado/a {name}:", "Gracias por postularse en Merç Global para el puesto: {role}.", "Nuestro equipo revisará su CV y le contactará si su perfil encaja. Conserve su número de referencia:", "Nunca se cobra ninguna tarifa a los candidatos.", "Saludos cordiales,\nMerç Global"],
     zh: ["我们已收到您的申请", "{name}，您好：", "感谢您向 Merç Global 申请以下职位：{role}。", "我们的团队将审核您的简历，如资历符合会与您联系。请保存您的申请编号：", "我们绝不以任何名义向求职者收费。", "此致\nMerç Global"],
+    it: ["Abbiamo ricevuto la tua candidatura", "Gentile {name},", "grazie per esserti candidato/a presso Merç Global per la posizione: {role}.", "Il nostro team esaminerà il tuo CV e ti contatterà se il tuo profilo è adatto. Conserva il tuo numero di riferimento:", "A chi cerca lavoro non viene mai richiesto alcun pagamento.", "Cordiali saluti,\nMerç Global"],
   };
   var t = T[lang] || T.en;
   var f = function (s) { return s.replace("{name}", name).replace("{role}", role); };

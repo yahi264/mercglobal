@@ -65,7 +65,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           items={navItems(l)}
           cta={{ href: href(l, "contact") + "#request", label: t("requestStaff") }}
           labels={{ menuOpen: t("menuOpen"), menuClose: t("menuClose"), language: t("language"), dark: t("darkMode"), light: t("lightMode"), home: t("navHome") }}
-          contact={{ phone: company.phoneDisplay, phoneHref: company.phoneHref, email: company.emails[0], city: "Kızılay / Ankara", whatsapp: mainWhatsApp }}
+          contact={{ phone: company.phoneDisplay, phoneHref: company.phoneHref, emails: company.topEmails, city: "Kızılay / Ankara", whatsapp: mainWhatsApp }}
         />
         <main>
           <PageFade>{children}</PageFade>
