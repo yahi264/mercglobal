@@ -1,6 +1,22 @@
 {
-  "updated": "2026-11-12",
+  "updated": "2026-11-13",
   "jobs": [
+    {
+      "id": "plpkx2bk",
+      "title": "developer",
+      "country": "morocco",
+      "city": "rabat",
+      "sector": "other",
+      "type": "long period",
+      "positions": "3",
+      "salary": "",
+      "description": "developing website",
+      "requirements": "Master’s degree\nCoursera certification",
+      "deadline": "",
+      "posted": "2026-11-13",
+      "language": "en",
+      "active": true
+    },
     {
       "id": "do090ujy",
       "title": "Engineer",
