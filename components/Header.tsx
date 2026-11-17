@@ -10,6 +10,7 @@ import { LanguageRow, LanguageSwitcher } from "./LanguageSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 import { LinkedInIcon, WhatsAppIcon } from "./Icons";
 import { Logo } from "./Logo";
+import { asset } from "@/lib/asset";
 
 export type NavLink = { href: string; label: string };
 export type NavItem = NavLink & { children?: NavLink[]; highlight?: boolean };
@@ -34,6 +35,7 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
   const logoRef = useRef<HTMLAnchorElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null); // language + theme buttons (always shown)
   const measureRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLAnchorElement>(null); // İŞKUR licence badge (far right)
   const [compact, setCompact] = useState<boolean | null>(null);
   useEffect(() => {
     const row = rowRef.current, logo = logoRef.current, actions = actionsRef.current, measure = measureRef.current;
@@ -45,7 +47,8 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
         if (window.innerWidth < 1280) return setCompact(true);
         const cs = getComputedStyle(row);
         const inner = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-        const free = inner - logo.scrollWidth - actions.offsetWidth - 26; // two gaps between logo / menu / buttons
+        const badge = badgeRef.current?.offsetWidth ?? 0;
+        const free = inner - logo.scrollWidth - actions.offsetWidth - badge - (badge ? 34 : 26); // gaps between logo / menu / buttons / badge
         setCompact(measure.scrollWidth > free);
       }, 60);
     };
@@ -210,6 +213,11 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
             >
               <Menu className="h-5 w-5" />
             </button>
+            {/* İŞKUR private employment office badge, as on the previous site */}
+            <Link ref={badgeRef} href={`/${locale}/certificates/`} className="hidden shrink-0 transition-transform hover:scale-105 sm:block" title="İŞKUR — Özel İstihdam Bürosu · No. 494">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={asset("/img/logo1.png")} alt="İŞKUR — Özel İstihdam Bürosu" width={44} height={44} className="h-11 w-11" />
+            </Link>
           </div>
         </div>
       </header>
