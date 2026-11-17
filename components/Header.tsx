@@ -214,9 +214,9 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
               <Menu className="h-5 w-5" />
             </button>
             {/* İŞKUR private employment office badge, as on the previous site */}
-            <Link ref={badgeRef} href={`/${locale}/certificates/`} className="hidden shrink-0 transition-transform hover:scale-105 sm:block" title="İŞKUR — Özel İstihdam Bürosu · No. 494">
+            <Link ref={badgeRef} href={`/${locale}/certificates/`} className="block shrink-0 transition-transform hover:scale-105" title="İŞKUR — Özel İstihdam Bürosu · No. 494">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={asset("/img/logo1.png")} alt="İŞKUR — Özel İstihdam Bürosu" width={44} height={44} className="h-11 w-11" />
+              <img src={asset("/img/logo1.png")} alt="İŞKUR — Özel İstihdam Bürosu" width={44} height={44} className="h-9 w-9 sm:h-11 sm:w-11" />
             </Link>
           </div>
         </div>
@@ -305,6 +305,10 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 </div>
                 <Link href={cta.href} className="btn-brand w-full">
                   {cta.label}
+                </Link>
+                <Link href={`/${locale}/certificates/`} className="mx-auto block w-fit" title="İŞKUR — Özel İstihdam Bürosu · No. 494">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset("/img/logo1.png")} alt="İŞKUR — Özel İstihdam Bürosu" width={80} height={80} className="h-20 w-20" loading="lazy" />
                 </Link>
               </div>
             </motion.aside>
