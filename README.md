@@ -45,20 +45,15 @@ It is a fully **static** site (Next.js 16 static export, folder `out`). Any web 
     # bash
     PAGES_BASE="" npm run build:pages
 
-## Job vacancies (admin page)
-- Vacancies are stored in `data/jobs.json` on branch `main` of the GitHub repository and are read live by the site,
-  so **publishing a vacancy needs no rebuild or upload**: it appears within 1–2 minutes on every copy of the site.
-- Open `/admin/`, paste a GitHub **fine-grained token** once (repository `yahi264/mercglobal`, permission
-  *Contents: Read and write*); it is kept only in that browser. Then add / edit / hide / delete vacancies
-  (or import them from the Word templates) and press **Publish**.
-- If the repository is moved to a company GitHub account, change `REPO` in `lib/jobs.ts` and rebuild.
-- Because the admin page commits to GitHub, run `git pull` before making code changes.
-
-## Application emails
-- Default: applications are sent through **FormSubmit** to `info@mercglobal.com.tr` with copies to the addresses in
-  `company.applyCc` (`lib/content.ts`). The first submission sends an activation email to info@; click it once.
-- Optional, nicer: install the Google Apps Script mailer in `scripts/apps-script` (branded team email + confirmation
-  to the candidate, CV attached), then put its Web app URL in `company.applyEndpoint` and rebuild.
+## Job vacancies, admin page and application emails
+Everything that needs a server runs in a Google Apps Script on the company Google Workspace account
+(info@turkishmanpower.com): see `scripts/apps-script/README.md`. Its web address is `company.apiEndpoint` in `lib/content.ts`.
+- **Admin page** `/admin/`: sign in with a username and password (tab *Admins* of the Google Sheet "Merç Global — Website").
+  Add / edit / hide / delete vacancies (or import them from the Word templates) and tick, for each vacancy and for general
+  applications, which company addresses receive the CVs. Changes appear on the site within a minute — no rebuild needed.
+- **Applications** (CV uploaded or created on the site) are emailed to those addresses with the CV attached, and the
+  candidate receives a thank-you email in their language.
+- **Google Analytics** (`company.analyticsId`) loads only after the visitor accepts the cookie notice.
 
 ## Adding / changing a language
 Texts live in `lib/content.ts` and `lib/i18n.ts` (one entry per language); `scripts/i18n/` has the helpers used to add

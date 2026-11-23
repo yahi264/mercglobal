@@ -43,25 +43,44 @@ export function Logo({ locale, tone = "auto", className = "", fit = false }: { l
       const chars = Math.max(1, (two.textContent ?? "").length - 1);
       two.style.letterSpacing = `${diff / chars}px`;
     };
-    // fit=true: shrink the whole logo when it is wider than the space it is given (small phones, long languages)
+    // fit=true: shrink the whole logo when it is wider than the space it is given (small phones, long languages).
+    // Measured once per real layout change: resizing the logo changes its own box, and reacting to that
+    // again made it jitter on iPhone Safari, so changes we caused ourselves are ignored.
+    let lastAvail = -1, lastWidth = -1, frame = 0;
     const all = () => {
       box.style.removeProperty("--lh");
       lines();
       const parent = box.parentElement;
-      if (!fit || !parent) return;
-      const avail = parent.clientWidth, need = box.scrollWidth;
-      if (need > avail + 1) {
-        const lh = parseFloat(getComputedStyle(box).getPropertyValue("--lh")) || 40;
-        box.style.setProperty("--lh", `${Math.max(14, (lh * avail) / need - 0.3)}px`);
-        lines();
+      if (fit && parent) {
+        const avail = parent.clientWidth, need = box.scrollWidth;
+        if (need > avail + 1) {
+          const lh = parseFloat(getComputedStyle(box).getPropertyValue("--lh")) || 40;
+          box.style.setProperty("--lh", `${Math.max(14, Math.floor(((lh * avail) / need - 0.3) * 4) / 4)}px`);
+          lines();
+        }
+        lastAvail = parent.clientWidth;
       }
+      lastWidth = window.innerWidth;
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(all);
     };
     all();
-    const ro = new ResizeObserver(all);
-    ro.observe(one);
+    const ro = new ResizeObserver(() => {
+      const w = box.parentElement?.clientWidth ?? 0;
+      if (Math.abs(w - lastAvail) > 2) schedule();
+    });
     if (fit && box.parentElement) ro.observe(box.parentElement);
-    document.fonts?.ready.then(all);
-    return () => ro.disconnect();
+    // window width changes (rotation, resizing); height-only changes (Safari's address bar) are ignored
+    const onResize = () => window.innerWidth !== lastWidth && schedule();
+    window.addEventListener("resize", onResize);
+    document.fonts?.ready.then(schedule);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frame);
+    };
   }, [a, b, fit]);
 
   const text = tone === "light" ? "text-white" : "text-black dark:text-white";

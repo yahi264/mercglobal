@@ -1,3 +1,4 @@
+import { CookieSettings } from "./CookieConsent";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { company, mainWhatsApp, text } from "@/lib/content";
@@ -107,7 +108,7 @@ export function Footer({ locale: l }: { locale: Locale }) {
 
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs sm:flex-row">
-          <p>© {new Date().getFullYear()} Merc Global · Merç Global Group. {t("rights")}</p>
+          <p>© {new Date().getFullYear()} Merc Global · Merç Global Group. {t("rights")} · <CookieSettings label="Cookies" /></p>
           <a href={`https://wa.me/${mainWhatsApp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white">
             <WhatsAppIcon className="h-4 w-4 text-whatsapp" /> {t("writeWhatsApp")}
           </a>

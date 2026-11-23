@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, FileText, Loader2, Mail, Paperclip, Send, UploadCloud, X } from "lucide-react";
-import { activeJobs, fetchJobs, type JobsFile } from "@/lib/jobs";
+import { activeJobs, fetchJobs, jobLabel, type JobsFile } from "@/lib/jobs";
 import { okFile, sendApplication } from "@/lib/send";
 import { WhatsAppIcon } from "./Icons";
 
@@ -24,6 +24,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
   const [jobs, setJobs] = useState(activeJobs(initial));
   const [v, setV] = useState({ name: "", email: "", phone: "", country: "", nationality: "", message: "" });
   const [position, setPosition] = useState("");
+  const [jobId, setJobId] = useState("");
   const [locked, setLocked] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [drag, setDrag] = useState(false);
@@ -37,12 +38,21 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     const p = q.get("position");
-    if (q.get("general")) setLocked(true); // "Send your CV" from the home page: general application
-    if (p) {
-      setPosition(p);
+    const id = q.get("job") ?? "";
+    if (q.get("general")) setLocked(true); // "Send your CV": general application
+    if (p || id) {
+      setPosition(p ?? "");
+      setJobId(id);
       setLocked(true);
     }
-    fetchJobs().then((f) => setJobs(activeJobs(f))).catch(() => {});
+    fetchJobs()
+      .then((f) => {
+        const list = activeJobs(f);
+        setJobs(list);
+        const j = id && list.find((x) => x.id === id);
+        if (j) setPosition(jobLabel(j));
+      })
+      .catch(() => {});
   }, []);
 
   const countries = useMemo(() => {
@@ -57,14 +67,17 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
 
   const role = position || t.general;
   // the CV builder always gets the job chosen here (also from the sidebar link and after a reload)
-  const cvLink = position ? `${cvHref}?position=${encodeURIComponent(position)}` : cvHref;
+  const jobQuery = position ? `?position=${encodeURIComponent(position)}${jobId ? `&job=${encodeURIComponent(jobId)}` : ""}` : "";
+  const cvLink = `${cvHref}${jobQuery}`;
   useEffect(() => {
     const u = new URL(location.href);
     if (position) u.searchParams.set("position", position);
     else u.searchParams.delete("position");
+    if (jobId) u.searchParams.set("job", jobId);
+    else u.searchParams.delete("job");
     history.replaceState(history.state, "", u);
-    window.dispatchEvent(new CustomEvent("mg:position", { detail: position }));
-  }, [position]);
+    window.dispatchEvent(new CustomEvent("mg:position", { detail: jobQuery }));
+  }, [position, jobId, jobQuery]);
   const pick = (f?: File | null) => {
     if (!f) return;
     if (!okFile(f)) {
@@ -84,7 +97,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
     setError("");
     setStatus("sending");
     const ok = await sendApplication(
-      { role, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), country: v.country, nationality: v.nationality, message: v.message },
+      { role, jobId: jobId || undefined, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), country: v.country, nationality: v.nationality, message: v.message },
       file,
     );
     setStatus(ok ? "ok" : "fail");
@@ -130,16 +143,22 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
               </button>
             </div>
           ) : (
-            <select className="field" value={position} onChange={(e) => setPosition(e.target.value)} aria-label={t.position}>
+            <select
+              className="field"
+              value={jobId}
+              onChange={(e) => {
+                const j = jobs.find((x) => x.id === e.target.value);
+                setJobId(j?.id ?? "");
+                setPosition(j ? jobLabel(j) : "");
+              }}
+              aria-label={t.position}
+            >
               <option value="">{t.general}</option>
-              {jobs.map((j) => {
-                const label = `${j.title} — ${[j.city, j.country].filter(Boolean).join(", ")}`;
-                return (
-                  <option key={j.id} value={label}>
-                    {label}
-                  </option>
-                );
-              })}
+              {jobs.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {jobLabel(j)}
+                </option>
+              ))}
             </select>
           )}
         </div>

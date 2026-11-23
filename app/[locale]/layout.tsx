@@ -9,6 +9,7 @@ import { Assistant } from "@/components/Assistant";
 import { buildKb } from "@/lib/assistant-kb";
 import { BackToTop, PageFade, ScrollProgress, SmoothScroll } from "@/components/Motion";
 import { Intro } from "@/components/Intro";
+import { CookieConsent } from "@/components/CookieConsent";
 import { introScript, themeScript } from "@/lib/head-scripts";
 import { company, mainWhatsApp, text } from "@/lib/content";
 import { dirOf, getT, isLocale, locales, type Locale } from "@/lib/i18n";
@@ -79,6 +80,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           greeting={`Merç Global — ${t("getInfo")}`}
         />
         <BackToTop label={t("backToTop")} />
+        <CookieConsent locale={l} analyticsId={company.analyticsId} />
       </body>
     </html>
   );

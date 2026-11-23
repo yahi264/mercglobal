@@ -114,6 +114,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
   const [status, setStatus] = useState<"idle" | "pdf" | "sending" | "ok" | "fail" | "need">("idle");
   // "Apply mode": the visitor came from a vacancy — the CV they build is sent as their application for it
   const [applyFor, setApplyFor] = useState("");
+  const [jobId, setJobId] = useState("");
   const [sentRole, setSentRole] = useState("");
   const t = L[cv.lang];
   const file = useRef<HTMLInputElement>(null);
@@ -137,10 +138,12 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
         next = { ...next, ...saved, experience: (saved.experience ?? next.experience).map((e: Partial<Exp>) => ({ ...blankExp(), ...e })) };
       }
     } catch {}
-    const pos = new URLSearchParams(location.search).get("position");
+    const q = new URLSearchParams(location.search);
+    const pos = q.get("position");
     if (pos) {
-      next.title = pos;
+      next.title = pos.split(" — ")[0];
       setApplyFor(pos);
+      setJobId(q.get("job") ?? "");
     }
     setCv(next);
     setLoaded(true);
@@ -262,6 +265,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
     const ok = await sendApplication(
       {
         role,
+        jobId: applyFor && jobId ? jobId : undefined,
         name: cv.name.trim(),
         email: cv.email.trim(),
         phone: cv.phone.trim(),
@@ -337,7 +341,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
           <p className="text-lg font-extrabold text-fg">{applyFor}</p>
           <p className="mt-1 text-sm text-muted">{ui.applyHint}</p>
         </div>
-        <button type="button" onClick={() => setApplyFor("")} className="shrink-0 text-xs font-semibold text-muted underline hover:text-brand">{ui.justCreate}</button>
+        <button type="button" onClick={() => (setApplyFor(""), setJobId(""))} className="shrink-0 text-xs font-semibold text-muted underline hover:text-brand">{ui.justCreate}</button>
       </div>
     )}
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">

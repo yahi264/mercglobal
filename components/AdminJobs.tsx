@@ -1,46 +1,47 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertCircle, CheckCircle2, Copy, Download, ExternalLink, Eye, EyeOff, FileUp, KeyRound, Loader2, LogOut, Pencil, Plus, RefreshCw, Save, Search, Sparkles, Trash2, X,
+  AlertCircle, CheckCircle2, Copy, Download, ExternalLink, Eye, EyeOff, FileUp, KeyRound, Loader2, LogOut, Mail, Pencil, Plus, RefreshCw, Save, Search, Sparkles, Trash2, User, X,
 } from "lucide-react";
-import { REPO, type Job, type JobsFile } from "@/lib/jobs";
+import { type Job } from "@/lib/jobs";
 import { localeNames, locales, type Locale } from "@/lib/i18n";
 import { asset } from "@/lib/asset";
+import { apiPost, hasApi } from "@/lib/api";
 import { fileToText, parseJobText } from "@/lib/job-import";
 
-// Admin panel for job vacancies (/admin/). Reads and saves data/jobs.json in the GitHub repository
-// through the GitHub API with a personal access token pasted once (kept only in this browser).
-// Every action publishes immediately; if someone else saved in the meantime, the latest list is
-// re-read and the change re-applied, so nothing is lost.
+// Admin panel for job vacancies (/admin/). Signs in with a username and password (tab "Admins" of the
+// website's Google Sheet) and manages the vacancies stored in that sheet through the website backend
+// (scripts/apps-script/Code.gs). For every vacancy, and for general applications, the admin ticks which
+// company addresses receive the CVs. The session is kept only in this browser tab.
 
 type Sector = { slug: string; title: string };
 type Toast = { ok: boolean; text: string } | null;
-const TOKEN_KEY = "merc-admin-token";
-const api = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/contents/${REPO.path}`;
+type Admin = { user: string; jobs: Job[]; generalRecipients: string[]; options: string[]; sheetUrl?: string };
+const SESSION_KEY = "merc-admin-session";
 const today = () => new Date().toISOString().slice(0, 10);
-const b64 = (s: string) => {
-  let bin = "";
-  new TextEncoder().encode(s).forEach((b) => (bin += String.fromCharCode(b)));
-  return btoa(bin);
-};
-const unb64 = (s: string) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
 const newId = () => Math.random().toString(36).slice(2, 10);
-const empty = (): Job => ({
-  id: newId(), title: "", country: "", city: "", sector: "construction-infrastructure", type: "", positions: "", salary: "",
-  description: "", requirements: "", deadline: "", posted: today(), language: "en", active: true,
-});
 const statusOf = (j: Job) => (!j.active ? "hidden" : j.deadline && j.deadline < today() ? "expired" : "live");
 
-export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJobsHref: string }) {
+const errText = (e: string | undefined) =>
+  ({
+    wrong: "Wrong username or password. · Kullanıcı adı veya şifre hatalı.",
+    locked: "Too many wrong attempts — try again in 15 minutes. · Çok fazla hatalı deneme; 15 dakika sonra tekrar deneyin.",
+    auth: "Your session has expired — please sign in again. · Oturum süresi doldu; tekrar giriş yapın.",
+    missing: "Please fill in the required fields. · Zorunlu alanları doldurun.",
+  })[e ?? ""] ?? (e ? `Error: ${e}` : "Connection problem — please try again. · Bağlantı sorunu; tekrar deneyin.");
+
+export function AdminJobs({ sectors }: { sectors: Sector[] }) {
   const [token, setToken] = useState("");
-  const [keyInput, setKeyInput] = useState("");
-  const [file, setFile] = useState<JobsFile | null>(null);
+  const [data, setData] = useState<Admin | null>(null);
+  const [login, setLogin] = useState({ username: "", password: "" });
   const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast>(null);
   const [edit, setEdit] = useState<Job | null>(null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "live" | "hidden" | "expired">("all");
+  const [general, setGeneral] = useState<string[]>([]);
+  const [pw, setPw] = useState<{ old: string; next: string } | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
 
   const notify = (ok: boolean, text: string) => {
@@ -48,42 +49,73 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), ok ? 5000 : 9000);
   };
-  const headers = useCallback((tk: string) => ({ Authorization: `Bearer ${tk}`, Accept: "application/vnd.github+json" }), []);
 
-  // Read the latest list (and its version "sha") straight from GitHub
-  const read = useCallback(
-    async (tk: string): Promise<{ data: JobsFile; sha?: string }> => {
-      const r = await fetch(`${api}?ref=${REPO.branch}&t=${Date.now()}`, { headers: headers(tk), cache: "no-store" });
-      if (r.status === 401) throw new Error("The access key is not valid or has expired. Please paste it again. · Erişim anahtarı geçersiz veya süresi dolmuş.");
-      if (r.status === 404) return { data: { updated: today(), jobs: [] } };
-      if (!r.ok) throw new Error(`GitHub error ${r.status}`);
-      const j = await r.json();
-      return { data: JSON.parse(unb64(j.content)) as JobsFile, sha: j.sha };
-    },
-    [headers],
-  );
+  const signOut = (msg?: string) => {
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch {}
+    setToken("");
+    setData(null);
+    if (msg) notify(false, msg);
+  };
 
-  // Apply a change to the latest list and publish it (retries if the list changed meanwhile)
-  const commit = async (label: string, change: (jobs: Job[]) => Job[], message: string) => {
+  // Load everything the admin needs (vacancies with their recipients, general-application recipients)
+  const load = async (tk: string) => {
+    const r = await apiPost<Admin>("admin_get", { token: tk });
+    if (!r.ok) {
+      if (r.error === "auth") return signOut(errText("auth"));
+      throw new Error(errText(r.error));
+    }
+    setData(r);
+    setGeneral(r.generalRecipients);
+  };
+
+  useEffect(() => {
+    try {
+      const tk = sessionStorage.getItem(SESSION_KEY);
+      if (tk) {
+        setBusy("connect");
+        setToken(tk);
+        load(tk).catch((e) => notify(false, (e as Error).message)).finally(() => setBusy(null));
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const signIn = async () => {
+    if (!login.username.trim() || !login.password) return notify(false, errText("missing"));
+    setBusy("connect");
+    try {
+      const r = await apiPost<{ token: string }>("login", { username: login.username.trim(), password: login.password });
+      if (!r.ok) throw new Error(errText(r.error));
+      try {
+        sessionStorage.setItem(SESSION_KEY, r.token);
+      } catch {}
+      setToken(r.token);
+      setLogin({ username: "", password: "" });
+      await load(r.token);
+    } catch (e) {
+      notify(false, (e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // Run an admin action, then reload the list from the sheet
+  const run = async (label: string, action: string, body: Record<string, unknown>, done: string) => {
     setBusy(label);
     try {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const { data, sha } = await read(token);
-        const next: JobsFile = { updated: today(), jobs: change(data.jobs) };
-        const r = await fetch(api, {
-          method: "PUT",
-          headers: { ...headers(token), "Content-Type": "application/json" },
-          body: JSON.stringify({ message, branch: REPO.branch, content: b64(JSON.stringify(next, null, 2) + "\n"), ...(sha ? { sha } : {}) }),
-        });
-        if (r.status === 409 || r.status === 422) continue; // someone saved at the same time: re-read and retry
-        if (r.status === 401) throw new Error("The access key is not valid or has expired. · Erişim anahtarı geçersiz.");
-        if (r.status === 403 || r.status === 404) throw new Error("This access key cannot save (it needs Contents: Read and write on yahi264/mercglobal). · Anahtarın yazma izni yok.");
-        if (!r.ok) throw new Error(`GitHub error ${r.status}`);
-        setFile(next);
-        notify(true, "Published ✓ — visible on the website within 1–2 minutes. · Yayınlandı ✓ — 1–2 dakika içinde sitede.");
-        return true;
+      const r = await apiPost(action, { token, ...body });
+      if (!r.ok) {
+        if (r.error === "auth") {
+          signOut(errText("auth"));
+          return false;
+        }
+        throw new Error(errText(r.error));
       }
-      throw new Error("Could not save after several tries — please try again. · Kaydedilemedi, tekrar deneyin.");
+      await load(token);
+      notify(true, done);
+      return true;
     } catch (e) {
       notify(false, (e as Error).message);
       return false;
@@ -91,84 +123,43 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
       setBusy(null);
     }
   };
-
-  const connect = async (tk: string, remember: boolean) => {
-    setBusy("connect");
-    try {
-      const { data } = await read(tk);
-      setFile(data);
-      setToken(tk);
-      if (remember) {
-        try {
-          localStorage.setItem(TOKEN_KEY, tk);
-        } catch {}
-      }
-      setKeyInput("");
-    } catch (e) {
-      notify(false, (e as Error).message);
-      if (!remember) {
-        try {
-          localStorage.removeItem(TOKEN_KEY);
-        } catch {}
-      }
-    } finally {
-      setBusy(null);
-    }
-  };
-  useEffect(() => {
-    try {
-      const tk = localStorage.getItem(TOKEN_KEY);
-      if (tk) connect(tk, false);
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const refresh = async () => {
-    setBusy("refresh");
-    try {
-      setFile((await read(token)).data);
-    } catch (e) {
-      notify(false, (e as Error).message);
-    } finally {
-      setBusy(null);
-    }
-  };
-  const logout = () => {
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-    } catch {}
-    setToken("");
-    setFile(null);
-  };
+  const published = "Published ✓ — visible on the website within a minute. · Yayınlandı ✓";
 
   const save = async (j: Job) => {
     const clean: Job = { ...j, title: j.title.trim(), country: j.country.trim(), city: j.city?.trim() };
-    const ok = await commit(
-      "save",
-      (jobs) => (jobs.some((x) => x.id === clean.id) ? jobs.map((x) => (x.id === clean.id ? clean : x)) : [clean, ...jobs]),
-      `Job vacancy: ${clean.title} (${clean.country})`,
-    );
-    if (ok) setEdit(null);
+    if (await run("save", "admin_save_job", { job: clean }, published)) setEdit(null);
   };
-  const toggle = (j: Job) => commit(j.id, (jobs) => jobs.map((x) => (x.id === j.id ? { ...x, active: !x.active } : x)), `${j.active ? "Hide" : "Show"} job vacancy: ${j.title}`);
+  const toggle = (j: Job) => run(j.id, "admin_save_job", { job: { ...j, active: !j.active } }, published);
   const remove = (j: Job) => {
     if (!confirm(`Delete “${j.title}”? This cannot be undone. · Silinsin mi? Geri alınamaz.`)) return;
-    commit(j.id, (jobs) => jobs.filter((x) => x.id !== j.id), `Delete job vacancy: ${j.title}`);
+    run(j.id, "admin_delete_job", { id: j.id }, "Deleted ✓ · Silindi ✓");
   };
   const duplicate = (j: Job) => setEdit({ ...j, id: newId(), title: `${j.title} (copy)`, posted: today() });
+  const saveGeneral = () => run("general", "admin_save_settings", { generalRecipients: general }, "Saved ✓ · Kaydedildi ✓");
+  const changePw = async () => {
+    if (!pw) return;
+    if (pw.next.length < 8) return notify(false, "The new password must have at least 8 characters. · Yeni şifre en az 8 karakter olmalı.");
+    if (await run("pw", "admin_change_password", { oldPassword: pw.old, newPassword: pw.next }, "Password changed ✓ · Şifre değiştirildi ✓")) setPw(null);
+  };
+
+  const empty = (): Job => ({
+    id: newId(), title: "", country: "", city: "", sector: "construction-infrastructure", type: "", positions: "", salary: "",
+    description: "", requirements: "", deadline: "", posted: today(), language: "en", active: true, recipients: data?.generalRecipients ?? [],
+  });
 
   const sectorName = useMemo(() => Object.fromEntries(sectors.map((s) => [s.slug, s.title])), [sectors]);
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return (file?.jobs ?? [])
+    return (data?.jobs ?? [])
       .filter((j) => filter === "all" || statusOf(j) === filter)
       .filter((j) => !t || `${j.title} ${j.country} ${j.city}`.toLowerCase().includes(t))
       .sort((a, b) => b.posted.localeCompare(a.posted));
-  }, [file, q, filter]);
+  }, [data, q, filter]);
   const counts = useMemo(() => {
     const c = { all: 0, live: 0, hidden: 0, expired: 0 };
-    file?.jobs.forEach((j) => (c.all++, c[statusOf(j)]++));
+    data?.jobs.forEach((j) => (c.all++, c[statusOf(j)]++));
     return c;
-  }, [file]);
+  }, [data]);
 
   const ToastBox = toast && (
     <div className={`fixed inset-x-4 bottom-5 z-[95] mx-auto flex max-w-xl items-start gap-3 rounded-2xl px-5 py-4 text-sm font-semibold shadow-2xl sm:inset-x-auto sm:end-6 ${toast.ok ? "bg-[#0f5132] text-white" : "bg-brand text-white"}`} role="status">
@@ -178,33 +169,36 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
     </div>
   );
 
-  // ── not connected ──
-  if (!token || !file) {
+  if (!hasApi())
+    return <p className="card mx-auto max-w-2xl p-8 text-center text-muted">The admin backend is not configured yet (company.apiEndpoint in lib/content.ts). · Yönetim servisi henüz ayarlanmadı.</p>;
+
+  // ── sign in ──
+  if (!token || !data) {
     return (
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div className="card space-y-4 p-6 sm:p-8">
-          <h2 className="flex items-center gap-2 text-xl font-extrabold text-fg"><KeyRound className="h-5 w-5 text-brand" /> Admin access · Yönetici girişi</h2>
-          <p className="text-sm text-muted">Paste the GitHub access key to manage job vacancies. It is stored only in this browser. · İş ilanlarını yönetmek için GitHub erişim anahtarını yapıştırın; yalnızca bu tarayıcıda saklanır.</p>
-          <input type="password" value={keyInput} onChange={(e) => setKeyInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && keyInput.trim() && connect(keyInput.trim(), true)} placeholder="github_pat_…" className="field font-mono text-sm" autoComplete="off" aria-label="Access key" />
-          <button type="button" onClick={() => connect(keyInput.trim(), true)} disabled={busy === "connect" || !keyInput.trim()} className="btn-brand w-full">
-            {busy === "connect" ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />} Connect · Bağlan
+      <div className="mx-auto max-w-md space-y-6">
+        <form className="card space-y-4 p-6 sm:p-8" onSubmit={(e) => (e.preventDefault(), signIn())}>
+          <h2 className="flex items-center gap-2 text-xl font-extrabold text-fg"><KeyRound className="h-5 w-5 text-brand" /> Admin sign in · Yönetici girişi</h2>
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-muted">Username · Kullanıcı adı</span>
+            <input className="field" value={login.username} onChange={(e) => setLogin({ ...login, username: e.target.value })} autoComplete="username" autoCapitalize="none" spellCheck={false} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-muted">Password · Şifre</span>
+            <input type="password" className="field" value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} autoComplete="current-password" />
+          </label>
+          <button type="submit" disabled={busy === "connect"} className="btn-brand w-full">
+            {busy === "connect" ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />} Sign in · Giriş yap
           </button>
-        </div>
-        <details className="card p-6 text-sm text-muted">
-          <summary className="cursor-pointer font-bold text-fg">How to create the access key (one time) · Anahtar nasıl oluşturulur</summary>
-          <ol className="mt-4 list-decimal space-y-2 ps-5">
-            <li>Sign in to GitHub as <b>{REPO.owner}</b> → <a className="font-semibold text-brand" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Fine-grained token <ExternalLink className="inline h-3 w-3" /></a></li>
-            <li>Repository access → <b>Only select repositories</b> → <b>{REPO.owner}/{REPO.name}</b></li>
-            <li>Permissions → <b>Contents: Read and write</b> → Generate token → copy and paste above.</li>
-          </ol>
-        </details>
+          <p className="text-xs text-muted">Admin accounts are managed in the website’s Google Sheet (tab “Admins”) on info@turkishmanpower.com. · Yönetici hesapları Google E-Tablosundaki “Admins” sekmesinden yönetilir.</p>
+        </form>
         {ToastBox}
       </div>
     );
   }
 
   // ── editor ──
-  if (edit) return <Editor job={edit} sectors={sectors} onCancel={() => setEdit(null)} onSave={save} saving={busy === "save"} isNew={!file.jobs.some((x) => x.id === edit.id)} toast={ToastBox} />;
+  if (edit)
+    return <Editor job={edit} sectors={sectors} options={data.options} onCancel={() => setEdit(null)} onSave={save} saving={busy === "save"} isNew={!data.jobs.some((x) => x.id === edit.id)} toast={ToastBox} />;
 
   // ── list ──
   const badge = { live: "bg-whatsapp/15 text-[#128c7e]", hidden: "bg-page-2 text-muted", expired: "bg-amber-100 text-amber-800" } as const;
@@ -215,9 +209,28 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
         <button type="button" onClick={() => setEdit(empty())} className="btn-brand !px-5"><Plus className="h-4 w-4" /> New vacancy · Yeni ilan</button>
         <button type="button" onClick={() => setEdit({ ...empty(), id: "__import__" + newId() })} className="btn-outline !px-5"><FileUp className="h-4 w-4" /> Import from document · Belgeden ekle</button>
         <span className="flex-1" />
-        <button type="button" onClick={refresh} disabled={!!busy} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand" title="Reload"><RefreshCw className={`h-3.5 w-3.5 ${busy === "refresh" ? "animate-spin" : ""}`} /> Refresh</button>
-        <a href={siteJobsHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><ExternalLink className="h-3.5 w-3.5" /> Website</a>
-        <button type="button" onClick={logout} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><LogOut className="h-3.5 w-3.5" /> Log out · Çıkış</button>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted"><User className="h-3.5 w-3.5" /> {data.user}</span>
+        <button type="button" onClick={() => (setBusy("refresh"), load(token).catch((e) => notify(false, (e as Error).message)).finally(() => setBusy(null)))} disabled={!!busy} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><RefreshCw className={`h-3.5 w-3.5 ${busy === "refresh" ? "animate-spin" : ""}`} /> Refresh</button>
+        <a href={asset("/en/jobs/")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><ExternalLink className="h-3.5 w-3.5" /> Website</a>
+        <button type="button" onClick={() => setPw(pw ? null : { old: "", next: "" })} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><KeyRound className="h-3.5 w-3.5" /> Password · Şifre</button>
+        <button type="button" onClick={() => signOut()} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><LogOut className="h-3.5 w-3.5" /> Log out · Çıkış</button>
+      </div>
+
+      {pw && (
+        <form className="card grid gap-3 p-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end" onSubmit={(e) => (e.preventDefault(), changePw())}>
+          <label><span className="mb-1 block text-xs font-semibold text-muted">Current password · Mevcut şifre</span><input type="password" className="field" value={pw.old} onChange={(e) => setPw({ ...pw, old: e.target.value })} autoComplete="current-password" /></label>
+          <label><span className="mb-1 block text-xs font-semibold text-muted">New password (8+ characters) · Yeni şifre</span><input type="password" className="field" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} autoComplete="new-password" /></label>
+          <button type="submit" disabled={busy === "pw"} className="btn-brand">{busy === "pw" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Change · Değiştir</button>
+        </form>
+      )}
+
+      {/* who receives general applications (not linked to a vacancy) */}
+      <div className="card space-y-3 p-5">
+        <p className="flex items-center gap-2 font-bold text-fg"><Mail className="h-4 w-4 text-brand" /> General applications are sent to · Genel başvurular şu adreslere gider</p>
+        <Recipients options={data.options} value={general} onChange={setGeneral} />
+        <button type="button" onClick={saveGeneral} disabled={busy === "general" || !general.length || general.join() === data.generalRecipients.join()} className="btn-outline !px-4 !py-2 text-sm">
+          {busy === "general" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save · Kaydet
+        </button>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -234,20 +247,22 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
         </div>
       </div>
 
-      {list.length === 0 && <p className="card p-10 text-center text-muted">{file.jobs.length ? "No vacancy matches. · Eşleşen ilan yok." : "No vacancies yet — click “New vacancy” or “Import from document”. · Henüz ilan yok."}</p>}
+      {list.length === 0 && <p className="card p-10 text-center text-muted">{data.jobs.length ? "No vacancy matches. · Eşleşen ilan yok." : "No vacancies yet — click “New vacancy” or “Import from document”. · Henüz ilan yok."}</p>}
       <ul className="space-y-3">
         {list.map((j) => {
           const st = statusOf(j);
           const working = busy === j.id;
+          const to = j.recipients?.length ? j.recipients : data.generalRecipients;
           return (
             <li key={j.id} className={`card flex flex-col gap-4 p-5 sm:flex-row sm:items-center ${st !== "live" ? "opacity-75" : ""}`}>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${badge[st]}`}>{badgeText[st]}</span>
-                  <span className="text-xs text-muted">{localeNames[j.language]} · {j.posted}{j.deadline ? ` → ${j.deadline}` : ""}</span>
+                  <span className="text-xs text-muted">{localeNames[j.language] ?? j.language} · {j.posted}{j.deadline ? ` → ${j.deadline}` : ""}</span>
                 </div>
                 <p className="mt-1.5 text-lg font-extrabold text-fg">{j.title}</p>
                 <p className="text-sm text-muted">{[j.city, j.country].filter(Boolean).join(", ")} · {sectorName[j.sector] ?? "Other · Diğer"}{j.positions ? ` · ${j.positions} pers.` : ""}</p>
+                <p className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted"><Mail className="h-3.5 w-3.5 text-brand" /> {to.join(" · ")}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {working ? (
@@ -270,8 +285,30 @@ export function AdminJobs({ sectors, siteJobsHref }: { sectors: Sector[]; siteJo
   );
 }
 
+// ── Checkboxes: which company addresses receive the CVs ──
+function Recipients({ options, value, onChange }: { options: string[]; value: string[]; onChange: (v: string[]) => void }) {
+  const all = options.every((o) => value.includes(o));
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button type="button" onClick={() => onChange(all ? [] : [...options])} className={`rounded-full border px-3 py-1.5 text-xs font-bold ${all ? "border-brand bg-brand text-white" : "border-line text-fg hover:border-brand"}`}>
+        All · Tümü
+      </button>
+      {options.map((o) => {
+        const on = value.includes(o);
+        return (
+          <label key={o} className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${on ? "border-brand bg-brand-soft text-brand" : "border-line text-fg hover:border-brand"}`}>
+            <input type="checkbox" className="h-3.5 w-3.5 accent-[#e3141e]" checked={on} onChange={() => onChange(on ? value.filter((x) => x !== o) : options.filter((x) => x === o || value.includes(x)))} />
+            {o}
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+
 // ── Vacancy editor (with "import from document") ──
-function Editor({ job, sectors, onCancel, onSave, saving, isNew, toast }: { job: Job; sectors: Sector[]; onCancel: () => void; onSave: (j: Job) => void; saving: boolean; isNew: boolean; toast: React.ReactNode }) {
+function Editor({ job, sectors, options, onCancel, onSave, saving, isNew, toast }: { job: Job; sectors: Sector[]; options: string[]; onCancel: () => void; onSave: (j: Job) => void; saving: boolean; isNew: boolean; toast: React.ReactNode }) {
   const importFirst = job.id.startsWith("__import__");
   const [j, setJ] = useState<Job>(importFirst ? { ...job, id: job.id.replace("__import__", "") } : job);
   const [filled, setFilled] = useState<Set<string>>(new Set());
@@ -401,6 +438,11 @@ function Editor({ job, sectors, onCancel, onSave, saving, isNew, toast }: { job:
           <label><span className={lab}>Apply by · Son başvuru (optional)</span><input type="date" className={f("deadline")} value={j.deadline ?? ""} onChange={(e) => set("deadline", e.target.value)} /></label>
           <label className="sm:col-span-2"><span className={lab}>Job description · İş tanımı *</span><textarea className={f("description", required.description)} rows={5} value={j.description} onChange={(e) => set("description", e.target.value)} /></label>
           <label className="sm:col-span-2"><span className={lab}>Requirements / qualifications — one per line · Aranan nitelikler — her satıra bir tane</span><textarea className={f("requirements")} rows={5} value={j.requirements ?? ""} onChange={(e) => set("requirements", e.target.value)} placeholder={"At least 5 years of experience\nValid welding certificate"} /></label>
+          <div className="space-y-2 rounded-xl border border-line bg-page-2 p-4 sm:col-span-2">
+            <p className="flex items-center gap-2 text-sm font-bold text-fg"><Mail className="h-4 w-4 text-brand" /> CVs for this vacancy are sent to · Bu ilanın CV’leri şu adreslere gider</p>
+            <Recipients options={options} value={j.recipients ?? []} onChange={(v) => set("recipients", v)} />
+            {!j.recipients?.length && <p className="text-xs text-muted">None ticked → the general-application addresses are used. · Hiçbiri seçilmezse genel başvuru adresleri kullanılır.</p>}
+          </div>
           <label className="flex items-center gap-2 sm:col-span-2"><input type="checkbox" checked={j.active} onChange={(e) => set("active", e.target.checked)} className="h-4 w-4 accent-[#e3141e]" /> <span className="text-sm font-semibold text-fg">Show on the website · Sitede göster</span></label>
         </div>
         {touched && !ok && <p className="flex items-center gap-2 rounded-xl bg-brand-soft px-4 py-3 text-sm font-medium text-brand"><AlertCircle className="h-4 w-4" /> Please fill in title, country and description. · Pozisyon, ülke ve iş tanımı zorunludur.</p>}

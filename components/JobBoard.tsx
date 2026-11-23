@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Briefcase, CalendarClock, FileText, MapPin, Search, Users, Wallet, X } from "lucide-react";
-import { activeJobs, fetchJobs, type Job, type JobsFile } from "@/lib/jobs";
+import { activeJobs, fetchJobs, jobLabel, type Job, type JobsFile } from "@/lib/jobs";
 import { localeNames, type Locale } from "@/lib/i18n";
 
 type Labels = Record<
@@ -59,7 +59,7 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
       .sort((a, b) => b.posted.localeCompare(a.posted));
   }, [file, q, sector]);
 
-  const withJob = (href: string, j: Job) => `${href}?position=${encodeURIComponent(`${j.title} — ${[j.city, j.country].filter(Boolean).join(", ")}`)}`;
+  const withJob = (href: string, j: Job) => `${href}?position=${encodeURIComponent(jobLabel(j))}&job=${encodeURIComponent(j.id)}`;
 
   return (
     <div>
@@ -98,7 +98,7 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
             <Link href={cvHref} className="btn-brand">
               <FileText className="h-4 w-4" /> {labels.cv}
             </Link>
-            <Link href={applyHref} className="btn-outline">
+            <Link href={`${applyHref}?general=1#apply`} className="btn-outline">
               {labels.apply}
             </Link>
           </div>

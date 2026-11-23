@@ -12,7 +12,7 @@ export const company = {
     { display: "+90 531 342 48 01", number: "905313424801" },
     { display: "+90 545 792 02 68", number: "905457920268" },
   ],
-  emails: ["info@mercglobal.com.tr", "ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com"],
+  emails: ["info@turkishmanpower.com", "ali@turkishmanpower.com", "umut@turkishmanpower.com", "cv@turkishmanpower.com", "merc_ltd@hotmail.com"],
   emergencyEmail: "merc_ltd@hotmail.com",
   linkedin: "https://www.linkedin.com/company/merc-recruitment-services-ltd/",
   // shown in the top bar of every page
@@ -21,13 +21,11 @@ export const company = {
   addressLines: ["Kızılay Mahallesi, Fevzi Çakmak 1 Sokak", "No: 17/4, Kızılay / Ankara — Türkiye"],
   mapEmbed:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3059.8077600382876!2d32.84815607529081!3d39.92331808552354!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14d34efe2d12f54b%3A0x9c81a6be6cf040ca!2sMer%C3%A7%20Global%20Group!5e0!3m2!1sen!2str!4v1672994862498!5m2!1sen!2str",
-  // CV builder "Send": FormSubmit (formsubmit.co) forwards submissions to this mailbox. The very first
-  // submission makes FormSubmit email an activation link to the address — click it once.
-  cvEndpoint: "https://formsubmit.co/ajax/info@mercglobal.com.tr",
-  // Branded mailer on the company Google account (scripts/apps-script/Code.gs). Empty = FormSubmit only.
-  applyEndpoint: "",
-  // Every application / CV is also copied to these company addresses.
-  applyCc: ["ali.merc@mercglobal.com.tr", "merc_ltd@hotmail.com", "cv@turkishmanpower.com"],
+  // Website backend on the company Google Workspace account (scripts/apps-script/Code.gs):
+  // job vacancies, admin login, and sending applications. Who receives the CVs is chosen on the admin page.
+  apiEndpoint: "",
+  // Google Analytics 4 (loaded only after the visitor accepts cookies)
+  analyticsId: "G-KMB78D1QJH",
   mapLink: "https://www.google.com/maps/search/?api=1&query=Mer%C3%A7+Global+Group+Ankara",
   licenceNo: "494",
   licenceDate: "22/09/2011",

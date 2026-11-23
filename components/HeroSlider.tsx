@@ -107,7 +107,7 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) 
         </div>
       </div>
 
-      <div className="container-x pointer-events-none relative z-10 pb-24 pt-16 md:pb-28">
+      <div className="container-x pointer-events-none relative z-10 pb-24 pt-16 md:pb-28 md:ps-20 min-[1440px]:ps-8">
         {/* Text is revealed word by word with CSS (see globals.css), so it also plays right after the intro */}
         <div key={i} className={`hero-text pointer-events-auto max-w-2xl text-white lg:max-w-[540px] xl:max-w-[600px] ${changed ? "" : "hero-first"}`}>
           <p className="hero-fade mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur" style={{ "--i": 0 } as React.CSSProperties}>
@@ -156,16 +156,24 @@ export function HeroSlider({ slides, eyebrow, ctaHref, labels, badges }: Props) 
               />
             ))}
           </div>
-          <div className="hidden gap-2 sm:flex">
-            <button type="button" onClick={() => go(i - 1)} aria-label={labels.prev} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 text-white backdrop-blur transition-colors hover:bg-white/15">
-              <ChevronLeft className="flip-rtl h-5 w-5" />
-            </button>
-            <button type="button" onClick={() => go(i + 1)} aria-label={labels.next} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 text-white backdrop-blur transition-colors hover:bg-white/15">
-              <ChevronRight className="flip-rtl h-5 w-5" />
-            </button>
-          </div>
         </div>
       </div>
+
+      {/* Previous / next arrows on each side */}
+      {[
+        { side: "start-2 sm:start-4", dir: -1, label: labels.prev, Icon: ChevronLeft },
+        { side: "end-2 sm:end-4", dir: 1, label: labels.next, Icon: ChevronRight },
+      ].map(({ side, dir, label, Icon }) => (
+        <button
+          key={dir}
+          type="button"
+          onClick={() => go(i + dir)}
+          aria-label={label}
+          className={`hero-arrow absolute ${side} top-[30%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-navy/25 text-white/85 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-white/60 hover:bg-white/15 hover:text-white focus-visible:outline-2 focus-visible:outline-white md:top-1/2 md:h-12 md:w-12`}
+        >
+          <Icon className="flip-rtl h-5 w-5 md:h-6 md:w-6" strokeWidth={1.6} />
+        </button>
+      ))}
       <span className="absolute end-4 top-6 z-10 hidden font-mono text-sm text-white/60 md:block" aria-hidden dir="ltr">
         {String(i + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
       </span>

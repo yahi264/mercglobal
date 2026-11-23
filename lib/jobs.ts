@@ -1,9 +1,9 @@
-// Job vacancies. They live in data/jobs.json in the GitHub repository (branch "main") and are
-// edited from the admin page (/admin/), which saves straight to GitHub. The site reads the latest
-// file when a visitor opens the Job Vacancies page, so new openings appear without rebuilding.
+// Job vacancies. They live in the Google Sheet of the website backend (scripts/apps-script/Code.gs)
+// and are managed from the admin page (/admin/) with a username and password. The site reads the
+// latest list when a visitor opens a page that shows vacancies, so new openings appear without rebuilding.
+// data/jobs.json is only the (empty) starting list built into the pages.
 import type { Locale } from "./i18n";
-
-export const REPO = { owner: "yahi264", name: "mercglobal", branch: "main", path: "data/jobs.json" };
+import { apiGet } from "./api";
 
 export type Job = {
   id: string;
@@ -20,23 +20,18 @@ export type Job = {
   posted: string; // YYYY-MM-DD
   language: Locale; // language the vacancy is written in
   active: boolean;
+  recipients?: string[]; // admin only: addresses that receive the CVs for this vacancy
 };
 
 export type JobsFile = { updated: string; jobs: Job[] };
 
-const api = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/contents/${REPO.path}?ref=${REPO.branch}`;
-const raw = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}/${REPO.branch}/${REPO.path}`;
-
-// Latest vacancies: GitHub API first (always fresh), raw file as a fallback.
 export async function fetchJobs(): Promise<JobsFile> {
-  try {
-    const r = await fetch(api, { headers: { Accept: "application/vnd.github.raw+json" }, cache: "no-store" });
-    if (r.ok) return (await r.json()) as JobsFile;
-  } catch {}
-  const r = await fetch(`${raw}?t=${Date.now()}`, { cache: "no-store" });
-  if (!r.ok) throw new Error(`jobs ${r.status}`);
-  return (await r.json()) as JobsFile;
+  const r = await apiGet<{ updated: string; jobs: Job[] }>("jobs");
+  if (!r.ok) throw new Error(r.error || "jobs");
+  return { updated: r.updated, jobs: r.jobs };
 }
 
 export const activeJobs = (f: JobsFile) =>
   f.jobs.filter((j) => j.active && (!j.deadline || j.deadline >= new Date().toISOString().slice(0, 10)));
+
+export const jobLabel = (j: Job) => `${j.title} — ${[j.city, j.country].filter(Boolean).join(", ")}`;
