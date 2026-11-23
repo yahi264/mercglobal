@@ -259,11 +259,11 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
         <div className="sm:col-span-2">
           <button type="submit" disabled={status === "sending"} className="btn-brand w-full !py-3.5 text-base">
             {status === "sending" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="flip-rtl h-5 w-5" />}
-            {status === "sending" ? `${t.sending} ${progress < 100 ? `${progress}%` : ""}` : t.send}
+            {status === "sending" ? `${t.sending} ${progress > 0 && progress < 100 ? `${progress}%` : ""}` : t.send}
           </button>
           {status === "sending" && (
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-page-2" aria-hidden>
-              <div className={`h-full rounded-full bg-brand transition-[width] duration-300 ${progress >= 100 ? "animate-pulse" : ""}`} style={{ width: `${Math.max(4, progress)}%` }} />
+              <div className={`h-full rounded-full bg-brand transition-[width] duration-300 ${progress >= 95 ? "animate-pulse" : ""}`} style={{ width: `${Math.max(4, progress)}%` }} />
             </div>
           )}
           <p className="mt-3 text-center text-xs text-muted">{t.consent}</p>

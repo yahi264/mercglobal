@@ -30,10 +30,7 @@ const toBase64 = (f: File) =>
     r.readAsDataURL(f);
   });
 
-/**
- * Sends the application. `onProgress` receives 0–100 while the CV is uploading, then 100 while the
- * team email is being sent (XMLHttpRequest is used because it reports upload progress).
- */
+/** Sends the application; `onProgress` receives 0–100 for the progress bar. */
 export async function sendApplication(a: Application, file?: File | null, onProgress?: (pct: number) => void): Promise<boolean> {
   if (!company.apiEndpoint) return false;
   let body: string;
@@ -48,23 +45,31 @@ export async function sendApplication(a: Application, file?: File | null, onProg
   } catch {
     return false;
   }
-  return new Promise<boolean>((resolve) => {
-    const x = new XMLHttpRequest();
-    x.open("POST", company.apiEndpoint);
-    x.setRequestHeader("Content-Type", "text/plain;charset=utf-8"); // "simple" request: no CORS preflight
-    x.timeout = 120000;
-    x.upload.onprogress = (e) => e.lengthComputable && onProgress?.(Math.min(99, Math.round((e.loaded / e.total) * 100)));
-    x.upload.onload = () => onProgress?.(100);
-    x.onload = () => {
-      try {
-        resolve(x.status >= 200 && x.status < 300 && JSON.parse(x.responseText).ok === true);
-      } catch {
-        resolve(false);
-      }
-    };
-    x.onerror = x.ontimeout = () => resolve(false);
-    x.send(body);
-  });
+  // Progress is estimated from the size (real upload events would force a CORS pre-check that the
+  // Google backend cannot answer). It moves smoothly towards 95% and jumps to 100% when done.
+  const expected = 3500 + (body.length / (700 * 1024)) * 1000; // ~3.5 s + ~0.7 MB/s
+  const t0 = Date.now();
+  const timer = window.setInterval(() => onProgress?.(Math.min(95, Math.round(95 * (1 - Math.exp(-(2.2 * (Date.now() - t0)) / expected))))), 250);
+  const ctrl = new AbortController();
+  const stop = window.setTimeout(() => ctrl.abort(), 180000);
+  try {
+    const r = await fetch(company.apiEndpoint, {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // "simple" request: no CORS preflight
+      redirect: "follow",
+      signal: ctrl.signal,
+    });
+    const j = (await r.json().catch(() => ({}))) as { ok?: boolean };
+    const ok = r.ok && j.ok === true;
+    if (ok) onProgress?.(100);
+    return ok;
+  } catch {
+    return false;
+  } finally {
+    window.clearInterval(timer);
+    window.clearTimeout(stop);
+  }
 }
 
 /** Smoothly brings an element to the top of the screen, below the sticky header. */
