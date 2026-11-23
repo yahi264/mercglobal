@@ -23,7 +23,7 @@ export const company = {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3059.8077600382876!2d32.84815607529081!3d39.92331808552354!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14d34efe2d12f54b%3A0x9c81a6be6cf040ca!2sMer%C3%A7%20Global%20Group!5e0!3m2!1sen!2str!4v1672994862498!5m2!1sen!2str",
   // Website backend on the company Google Workspace account (scripts/apps-script/Code.gs):
   // job vacancies, admin login, and sending applications. Who receives the CVs is chosen on the admin page.
-  apiEndpoint: "",
+  apiEndpoint: "https://script.google.com/macros/s/AKfycbwT_zAqZ6X-r0tkYUpHH_7siBvkf5m6aZ8xVWAtPGCA12Dhcoe_pEia0NqHkJqnhJzr/exec",
   // Google Analytics 4 (loaded only after the visitor accepts cookies)
   analyticsId: "G-KMB78D1QJH",
   mapLink: "https://www.google.com/maps/search/?api=1&query=Mer%C3%A7+Global+Group+Ankara",
