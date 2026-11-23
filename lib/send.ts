@@ -30,11 +30,35 @@ const toBase64 = (f: File) =>
     r.readAsDataURL(f);
   });
 
+// Photos of CVs taken with a phone are often 3–8 MB: they are resized (max 2200 px) and saved as
+// good-quality JPEG before sending, so they upload several times faster and stay easy to read.
+async function shrinkPhoto(f: File): Promise<File> {
+  if (!/^image\/(jpeg|png|webp|heic|heif)$/i.test(f.type) || f.size < 1.2 * 1024 * 1024) return f;
+  try {
+    const img = await createImageBitmap(f);
+    const scale = Math.min(1, 2200 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * scale);
+    c.height = Math.round(img.height * scale);
+    const g = c.getContext("2d");
+    if (!g) return f;
+    g.fillStyle = "#fff";
+    g.fillRect(0, 0, c.width, c.height);
+    g.drawImage(img, 0, 0, c.width, c.height);
+    const blob = await new Promise<Blob | null>((res) => c.toBlob(res, "image/jpeg", 0.85));
+    if (!blob || blob.size >= f.size) return f;
+    return new File([blob], f.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch {
+    return f; // the browser cannot read this image format: send it as it is
+  }
+}
+
 /** Sends the application; `onProgress` receives 0–100 for the progress bar. */
 export async function sendApplication(a: Application, file?: File | null, onProgress?: (pct: number) => void): Promise<boolean> {
   if (!company.apiEndpoint) return false;
   let body: string;
   try {
+    if (file) file = await shrinkPhoto(file);
     body = JSON.stringify({
       action: "apply",
       ...a,
