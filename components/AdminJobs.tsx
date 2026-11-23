@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertCircle, CheckCircle2, Copy, Download, ExternalLink, Eye, EyeOff, FileUp, KeyRound, Loader2, LogOut, Mail, Pencil, Plus, RefreshCw, Save, Search, Sparkles, Trash2, User, X,
+  AlertCircle, CheckCircle2, Copy, Download, ExternalLink, Eye, EyeOff, FileUp, KeyRound, Loader2, LogOut, Mail, Pencil, Plus, RefreshCw, Save, Search, Sparkles, Trash2, User, Users, X,
 } from "lucide-react";
 import { type Job } from "@/lib/jobs";
 import { localeNames, locales, type Locale } from "@/lib/i18n";
@@ -17,7 +17,7 @@ import { fileToText, parseJobText } from "@/lib/job-import";
 
 type Sector = { slug: string; title: string };
 type Toast = { ok: boolean; text: string } | null;
-type Admin = { user: string; jobs: Job[]; generalRecipients: string[]; options: string[]; sheetUrl?: string };
+type Admin = { user: string; isSuper?: boolean; jobs: Job[]; generalRecipients: string[]; options: string[]; sheetUrl?: string };
 const SESSION_KEY = "merc-admin-session";
 const today = () => new Date().toISOString().slice(0, 10);
 const newId = () => Math.random().toString(36).slice(2, 10);
@@ -29,6 +29,7 @@ const errText = (e: string | undefined) =>
     locked: "Too many wrong attempts — try again in 15 minutes. · Çok fazla hatalı deneme; 15 dakika sonra tekrar deneyin.",
     auth: "Your session has expired — please sign in again. · Oturum süresi doldu; tekrar giriş yapın.",
     missing: "Please fill in the required fields. · Zorunlu alanları doldurun.",
+    forbidden: "Only a super admin can do this. · Bu işlem için süper yönetici yetkisi gerekir.",
   })[e ?? ""] ?? (e ? `Error: ${e}` : "Connection problem — please try again. · Bağlantı sorunu; tekrar deneyin.");
 
 export function AdminJobs({ sectors }: { sectors: Sector[] }) {
@@ -42,6 +43,7 @@ export function AdminJobs({ sectors }: { sectors: Sector[] }) {
   const [filter, setFilter] = useState<"all" | "live" | "hidden" | "expired">("all");
   const [general, setGeneral] = useState<string[]>([]);
   const [pw, setPw] = useState<{ old: string; next: string } | null>(null);
+  const [showUsers, setShowUsers] = useState(false);
   const toastTimer = useRef<number | undefined>(undefined);
 
   const notify = (ok: boolean, text: string) => {
@@ -212,6 +214,9 @@ export function AdminJobs({ sectors }: { sectors: Sector[] }) {
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted"><User className="h-3.5 w-3.5" /> {data.user}</span>
         <button type="button" onClick={() => (setBusy("refresh"), load(token).catch((e) => notify(false, (e as Error).message)).finally(() => setBusy(null)))} disabled={!!busy} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><RefreshCw className={`h-3.5 w-3.5 ${busy === "refresh" ? "animate-spin" : ""}`} /> Refresh</button>
         <a href={asset("/en/jobs/")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><ExternalLink className="h-3.5 w-3.5" /> Website</a>
+        {data.isSuper && (
+          <button type="button" onClick={() => setShowUsers((x) => !x)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><Users className="h-3.5 w-3.5" /> Users · Kullanıcılar</button>
+        )}
         <button type="button" onClick={() => setPw(pw ? null : { old: "", next: "" })} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><KeyRound className="h-3.5 w-3.5" /> Password · Şifre</button>
         <button type="button" onClick={() => signOut()} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-brand"><LogOut className="h-3.5 w-3.5" /> Log out · Çıkış</button>
       </div>
@@ -223,6 +228,8 @@ export function AdminJobs({ sectors }: { sectors: Sector[] }) {
           <button type="submit" disabled={busy === "pw"} className="btn-brand">{busy === "pw" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Change · Değiştir</button>
         </form>
       )}
+
+      {data.isSuper && showUsers && <UsersPanel token={token} me={data.user} notify={notify} onAuthLost={() => signOut(errText("auth"))} />}
 
       {/* who receives general applications (not linked to a vacancy) */}
       <div className="card space-y-3 p-5">
@@ -281,6 +288,97 @@ export function AdminJobs({ sectors }: { sectors: Sector[] }) {
         })}
       </ul>
       {ToastBox}
+    </div>
+  );
+}
+
+// ── Admin users (super admins only): add, rename, reset password, delete ──
+type AdminUser = { username: string; note: string; super: boolean };
+function UsersPanel({ token, me, notify, onAuthLost }: { token: string; me: string; notify: (ok: boolean, t: string) => void; onAuthLost: () => void }) {
+  const [users, setUsers] = useState<AdminUser[] | null>(null);
+  const [form, setForm] = useState<{ oldUsername: string; username: string; password: string; note: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const call = async (action: string, body: Record<string, unknown>) => {
+    const r = await apiPost<{ users: AdminUser[] }>(action, { token, ...body });
+    if (!r.ok) {
+      if (r.error === "auth") onAuthLost();
+      throw new Error(errText(r.error));
+    }
+    return r;
+  };
+  const reload = async () => setUsers((await call("admin_users", {})).users);
+  useEffect(() => {
+    reload().catch((e) => notify(false, (e as Error).message));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const save = async () => {
+    if (!form) return;
+    setBusy(true);
+    try {
+      await call("admin_save_user", form);
+      await reload();
+      notify(true, "Saved ✓ · Kaydedildi ✓");
+      setForm(null);
+    } catch (e) {
+      notify(false, (e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const del = async (u: AdminUser) => {
+    if (!confirm(`Delete the admin “${u.username}”? · “${u.username}” silinsin mi?`)) return;
+    setBusy(true);
+    try {
+      await call("admin_delete_user", { username: u.username });
+      await reload();
+      notify(true, "Deleted ✓ · Silindi ✓");
+    } catch (e) {
+      notify(false, (e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const lab = "mb-1 block text-xs font-semibold text-muted";
+  return (
+    <div className="card space-y-4 p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="flex flex-1 items-center gap-2 font-bold text-fg"><Users className="h-4 w-4 text-brand" /> Admin users · Yönetici kullanıcıları</p>
+        <button type="button" onClick={() => setForm({ oldUsername: "", username: "", password: "", note: "" })} className="btn-outline !px-3 !py-2 text-xs"><Plus className="h-3.5 w-3.5" /> Add user · Kullanıcı ekle</button>
+      </div>
+      {!users ? (
+        <p className="flex items-center gap-2 text-sm text-muted"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</p>
+      ) : (
+        <ul className="divide-y divide-line rounded-xl border border-line">
+          {users.map((u) => (
+            <li key={u.username} className="flex flex-wrap items-center gap-3 px-4 py-3">
+              <span className="min-w-0 flex-1">
+                <b className="text-fg">{u.username}</b>
+                {u.super && <span className="ms-2 rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-bold text-brand">super admin</span>}
+                {u.username === me && <span className="ms-2 text-xs text-muted">(you · siz)</span>}
+                {u.note && <span className="block text-xs text-muted">{u.note}</span>}
+              </span>
+              <button type="button" disabled={busy} onClick={() => setForm({ oldUsername: u.username, username: u.username, password: "", note: u.note })} className="btn-outline !px-3 !py-1.5 text-xs"><Pencil className="h-3.5 w-3.5" /> Edit / reset password · Düzenle / şifre sıfırla</button>
+              {u.username !== me && (
+                <button type="button" disabled={busy} onClick={() => del(u)} className="btn-outline !px-3 !py-1.5 text-xs hover:!border-brand hover:!text-brand"><Trash2 className="h-3.5 w-3.5" /> Delete · Sil</button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {form && (
+        <form className="grid gap-3 rounded-xl bg-page-2 p-4 sm:grid-cols-3" onSubmit={(e) => (e.preventDefault(), save())}>
+          <label><span className={lab}>Username · Kullanıcı adı</span><input className="field" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} autoCapitalize="none" spellCheck={false} autoComplete="off" /></label>
+          <label><span className={lab}>{form.oldUsername ? "New password (empty = keep) · Yeni şifre (boş = aynı)" : "Password (8+ characters) · Şifre"}</span><input type="password" className="field" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" /></label>
+          <label><span className={lab}>Name / note · Ad / not</span><input className="field" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
+          <div className="flex gap-2 sm:col-span-3">
+            <button type="submit" disabled={busy} className="btn-brand !px-5 !py-2.5 text-sm">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save · Kaydet</button>
+            <button type="button" onClick={() => setForm(null)} className="btn-outline !px-5 !py-2.5 text-sm">Cancel · İptal</button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

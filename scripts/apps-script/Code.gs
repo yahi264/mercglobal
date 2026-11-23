@@ -34,6 +34,8 @@ var CONFIG = {
   timezone: "Europe/Istanbul",
   maxFileMb: 8,
   sessionHours: 12,
+  // Super admins can add, rename and delete admin users and reset their passwords from the admin page.
+  superAdmins: ["yahia_yahia"],
   sheetName: "Merç Global — Website",
 };
 
@@ -65,6 +67,12 @@ function doPost(e) {
     if (action === "admin_delete_job") return json(withLock(function () { return deleteJob(d.id); }));
     if (action === "admin_save_settings") return json(withLock(function () { return saveSettings(d.generalRecipients); }));
     if (action === "admin_change_password") return json(withLock(function () { return changePassword(user, d.oldPassword, d.newPassword); }));
+    if (action === "admin_users" || action === "admin_save_user" || action === "admin_delete_user") {
+      if (!isSuper(user)) return json({ ok: false, error: "forbidden" });
+      if (action === "admin_users") return json({ ok: true, users: listUsers() });
+      if (action === "admin_save_user") return json(withLock(function () { return saveUser(d.oldUsername, d.username, d.password, d.note); }));
+      return json(withLock(function () { return deleteUser(d.username, user); }));
+    }
     return json({ ok: false, error: "unknown action" });
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -208,7 +216,7 @@ function cleanRecipients(list) {
 }
 
 function adminData(user) {
-  return { ok: true, user: user, jobs: readJobs(), generalRecipients: generalRecipients(), options: CONFIG.recipients, sheetUrl: book().getUrl() };
+  return { ok: true, user: user, isSuper: isSuper(user), jobs: readJobs(), generalRecipients: generalRecipients(), options: CONFIG.recipients, sheetUrl: book().getUrl() };
 }
 
 function withLock(fn) {
@@ -296,6 +304,55 @@ function changePassword(user, oldPw, newPw) {
   return { ok: false, error: "user" };
 }
 
+// ───────────────────────── admin users (super admins only) ─────────────────────────
+function isSuper(user) {
+  return CONFIG.superAdmins.indexOf(String(user).toLowerCase()) > -1;
+}
+function listUsers() {
+  var rows = book().getSheetByName("Admins").getDataRange().getValues();
+  var out = [];
+  for (var r = 1; r < rows.length; r++) {
+    var u = String(rows[r][0]).trim();
+    if (u) out.push({ username: u, note: cell(rows[r][2]), super: isSuper(u.toLowerCase()) });
+  }
+  return out;
+}
+// create a user, rename one (oldUsername) and/or set a new password
+function saveUser(oldUsername, username, password, note) {
+  username = String(username || "").trim().toLowerCase();
+  oldUsername = String(oldUsername || "").trim().toLowerCase();
+  if (!/^[a-z0-9._-]{3,30}$/.test(username)) return { ok: false, error: "Username: 3–30 letters, numbers, dot, dash or underscore." };
+  if (password && String(password).length < 8) return { ok: false, error: "The password must have at least 8 characters." };
+  var sh = book().getSheetByName("Admins");
+  var rows = sh.getDataRange().getValues();
+  var row = -1;
+  for (var r = 1; r < rows.length; r++) {
+    var u = String(rows[r][0]).trim().toLowerCase();
+    if (u === username && u !== oldUsername) return { ok: false, error: "This username already exists." };
+    if (oldUsername && u === oldUsername) row = r + 1;
+  }
+  if (row < 0) {
+    if (!password) return { ok: false, error: "A password is required for a new user." };
+    sh.appendRow([username, "", note || ""]);
+    row = sh.getLastRow();
+  }
+  sh.getRange(row, 1).setValue(username);
+  if (note != null) sh.getRange(row, 3).setValue(note);
+  if (password) {
+    var salt = Utilities.getUuid();
+    sh.getRange(row, 2).setValue("sha256$" + salt + "$" + hashPw(salt, String(password)));
+  }
+  return { ok: true };
+}
+function deleteUser(username, me) {
+  username = String(username || "").trim().toLowerCase();
+  if (username === String(me).toLowerCase()) return { ok: false, error: "You cannot delete your own account." };
+  var sh = book().getSheetByName("Admins");
+  var rows = sh.getDataRange().getValues();
+  for (var r = rows.length - 1; r >= 1; r--) if (String(rows[r][0]).trim().toLowerCase() === username) sh.deleteRow(r + 1);
+  return { ok: true };
+}
+
 // ───────────────────────── applications ─────────────────────────
 function apply(d) {
   if (d.website) return { ok: true }; // honeypot field filled by bots
@@ -330,7 +387,7 @@ function apply(d) {
   GmailApp.sendEmail(to.join(","), "New application · " + role + " · " + d.name + " (" + ref + ")", teamText(d, ref, when), {
     htmlBody: teamHtml(d, ref, when),
     replyTo: d.email,
-    name: CONFIG.senderName + " — Website",
+    name: String(d.name).replace(/[<>"]/g, "").slice(0, 60) + " via Merç Global Website", // shows the candidate; Reply goes to the candidate
     attachments: attachments,
   });
 

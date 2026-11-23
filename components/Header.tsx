@@ -197,7 +197,8 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <div ref={actionsRef} className="flex items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher locale={locale} label={labels.language} />
-            <div className="max-[359px]:hidden">
+            {/* on phones the light/dark switch lives in the ☰ menu, leaving room for the logo */}
+            <div className="hidden sm:block">
               <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
             </div>
             </div>
@@ -294,6 +295,10 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 ))}
               </nav>
               <div className="space-y-4 border-t border-line p-5">
+                <div className="flex items-center justify-between gap-3 sm:hidden">
+                  <span className="text-sm font-semibold text-fg">{labels.light} / {labels.dark}</span>
+                  <ThemeToggle darkLabel={labels.dark} lightLabel={labels.light} />
+                </div>
                 <LanguageRow locale={locale} onPick={() => setOpen(false)} />
                 <div className="grid grid-cols-2 gap-2">
                   <a href={contact.phoneHref} className="btn-outline whitespace-nowrap !px-2 !text-[13px]">
