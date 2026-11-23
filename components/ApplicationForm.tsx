@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, FileText, Loader2, Mail, Paperclip, Send, UploadCloud, X } from "lucide-react";
 import { activeJobs, fetchJobs, jobLabel, type JobsFile } from "@/lib/jobs";
-import { okFile, sendApplication } from "@/lib/send";
+import { okFile, scrollToTop, sendApplication } from "@/lib/send";
 import { WhatsAppIcon } from "./Icons";
 
 // Job application: the candidate uploads an existing CV (PDF / Word / photo) and sends it, with the
@@ -31,6 +31,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "fail">("idle");
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
+  const [progress, setProgress] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   const top = useRef<HTMLDivElement>(null);
 
@@ -95,14 +96,19 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) return setError(t.badEmail);
     if (!file) return setError(t.needFile);
     setError("");
+    setProgress(0);
     setStatus("sending");
     const ok = await sendApplication(
       { role, jobId: jobId || undefined, name: v.name.trim(), email: v.email.trim(), phone: v.phone.trim(), country: v.country, nationality: v.nationality, message: v.message },
       file,
+      setProgress,
     );
     setStatus(ok ? "ok" : "fail");
-    top.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
+  // after sending, bring the result (confirmation or error) smoothly into view
+  useEffect(() => {
+    if (status === "ok" || status === "fail") requestAnimationFrame(() => scrollToTop(top.current));
+  }, [status]);
 
   const reset = () => {
     setStatus("idle");
@@ -112,7 +118,7 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
 
   if (status === "ok")
     return (
-      <div ref={top} className="card flex flex-col items-center gap-4 p-8 text-center sm:p-12" role="status">
+      <div ref={top} className="card pop-in flex flex-col items-center gap-4 p-8 text-center sm:p-12" role="status">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-whatsapp/15 text-[#128c7e]">
           <CheckCircle2 className="h-9 w-9" />
         </span>
@@ -253,8 +259,13 @@ export function ApplicationForm({ labels: t, initial, cvHref, email, whatsapp, l
         <div className="sm:col-span-2">
           <button type="submit" disabled={status === "sending"} className="btn-brand w-full !py-3.5 text-base">
             {status === "sending" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="flip-rtl h-5 w-5" />}
-            {status === "sending" ? t.sending : t.send}
+            {status === "sending" ? `${t.sending} ${progress < 100 ? `${progress}%` : ""}` : t.send}
           </button>
+          {status === "sending" && (
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-page-2" aria-hidden>
+              <div className={`h-full rounded-full bg-brand transition-[width] duration-300 ${progress >= 100 ? "animate-pulse" : ""}`} style={{ width: `${Math.max(4, progress)}%` }} />
+            </div>
+          )}
           <p className="mt-3 text-center text-xs text-muted">{t.consent}</p>
         </div>
       </form>

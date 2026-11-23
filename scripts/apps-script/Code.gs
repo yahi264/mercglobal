@@ -32,7 +32,7 @@ var CONFIG = {
   whatsapp: "905313424801",
   phone: "+90 312 230 31 82",
   timezone: "Europe/Istanbul",
-  maxFileMb: 8,
+  maxFileMb: 15, // the website allows 10 MB; Gmail allows 25 MB per email
   sessionHours: 12,
   // Super admins can add, rename and delete admin users and reset their passwords from the admin page.
   superAdmins: ["yahia_yahia"],
@@ -87,7 +87,10 @@ function setup() {
 }
 
 // ───────────────────────── Google Sheet storage ─────────────────────────
+// The sheet is opened once per request (opening it several times made every request slower).
+var BOOK_ = null;
 function book() {
+  if (BOOK_) return BOOK_;
   var props = PropertiesService.getScriptProperties();
   var id = props.getProperty("SHEET_ID");
   var ss = null;
@@ -97,7 +100,10 @@ function book() {
   if (!ss) {
     ss = SpreadsheetApp.create(CONFIG.sheetName);
     props.setProperty("SHEET_ID", ss.getId());
+    props.deleteProperty("TABS_OK");
   }
+  BOOK_ = ss;
+  if (props.getProperty("TABS_OK") === "2") return ss; // tabs already created
   ensureTab(ss, "Jobs", JOB_COLS);
   ensureTab(ss, "Settings", ["key", "value"], function (sh) {
     sh.appendRow(["generalRecipients", CONFIG.recipients.join(",")]);
@@ -110,6 +116,7 @@ function book() {
   ensureTab(ss, "Applications", ["Date", "Reference", "Position", "Name", "Email", "Phone", "Country", "Sent to", "CV"]);
   var first = ss.getSheetByName("Sheet1") || ss.getSheetByName("Sayfa1");
   if (first && ss.getSheets().length > 1) ss.deleteSheet(first);
+  props.setProperty("TABS_OK", "2");
   return ss;
 }
 
@@ -384,7 +391,9 @@ function apply(d) {
   }
   d.role = role;
 
-  GmailApp.sendEmail(to.join(","), "New application · " + role + " · " + d.name + " (" + ref + ")", teamText(d, ref, when), {
+  // Subject starts with the candidate's name, so it is readable in every inbox list (info@ shows "me" as sender)
+  var subject = d.name + " — " + role + (d.country ? " · " + d.country : "") + " · " + ref;
+  GmailApp.sendEmail(to.join(","), subject, teamText(d, ref, when), {
     htmlBody: teamHtml(d, ref, when),
     replyTo: d.email,
     name: String(d.name).replace(/[<>"]/g, "").slice(0, 60) + " via Merç Global Website", // shows the candidate; Reply goes to the candidate

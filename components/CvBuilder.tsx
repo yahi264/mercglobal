@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Download, FileText, Loader2, Mail, Plus, RotateCcw, Send, Trash2, Upload, AlertCircle } from "lucide-react";
 import { asset } from "@/lib/asset";
 import { WhatsAppIcon } from "./Icons";
-import { sendApplication } from "@/lib/send";
+import { scrollToTop, sendApplication } from "@/lib/send";
 
 // Online CV builder for job seekers. The CV is written in English or Turkish (the candidate chooses),
 // shown live in a clean A4 layout and saved only in the visitor's browser. "Send" turns the CV into a
@@ -118,6 +118,8 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
   const [sentRole, setSentRole] = useState("");
   const t = L[cv.lang];
   const file = useRef<HTMLInputElement>(null);
+  const done = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
   const countries = useMemo(() => {
     try {
@@ -256,6 +258,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
 
   const sendNow = async () => {
     if (!cv.name.trim() || !cv.email.trim() || !cv.phone.trim()) return setStatus("need");
+    setProgress(0);
     setStatus("sending");
     let pdf: File | null = null;
     try {
@@ -288,13 +291,15 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
         },
       },
       pdf,
+      setProgress,
     );
-    if (ok) {
-      setSentRole(role);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    if (ok) setSentRole(role);
     setStatus(ok ? "ok" : "fail");
   };
+  // after sending, bring the confirmation smoothly into view (below the sticky header)
+  useEffect(() => {
+    if (status === "ok") requestAnimationFrame(() => scrollToTop(done.current));
+  }, [status]);
   const sendMail = () => {
     const body = (cv.message ? cv.message + "\n\n" : "") + asText();
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -318,7 +323,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
 
   if (status === "ok")
     return (
-      <div className="card mx-auto flex max-w-2xl flex-col items-center gap-4 p-8 text-center sm:p-12" role="status">
+      <div ref={done} className="card pop-in mx-auto flex max-w-2xl flex-col items-center gap-4 p-8 text-center sm:p-12" role="status">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-whatsapp/15 text-[#128c7e]">
           <CheckCircle2 className="h-9 w-9" />
         </span>
@@ -484,7 +489,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
           </label>
           {applyFor ? (
             <button type="button" onClick={sendNow} disabled={busy} className="btn-brand w-full !py-3.5 text-base">
-              {status === "sending" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="flip-rtl h-5 w-5" />} {status === "sending" ? ui.sending : ui.applyNow}
+              {status === "sending" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="flip-rtl h-5 w-5" />} {status === "sending" ? `${ui.sending} ${progress > 0 && progress < 100 ? `${progress}%` : ""}` : ui.applyNow}
             </button>
           ) : (
             <>
@@ -492,7 +497,7 @@ export function CvBuilder({ ui, email, whatsapp, defaultLang }: { ui: UiLabels; 
                 {status === "pdf" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />} {ui.downloadMine}
               </button>
               <button type="button" onClick={sendNow} disabled={busy} className="btn-outline w-full">
-                {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="flip-rtl h-4 w-4" />} {status === "sending" ? ui.sending : ui.sendGeneral}
+                {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="flip-rtl h-4 w-4" />} {status === "sending" ? `${ui.sending} ${progress > 0 && progress < 100 ? `${progress}%` : ""}` : ui.sendGeneral}
               </button>
             </>
           )}

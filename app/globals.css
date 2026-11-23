@@ -563,3 +563,11 @@ html[lang="zh"] {
     scrollbar-color: rgb(227 20 30 / 0.45) transparent;
   }
 }
+
+/* confirmation cards appear softly after an application is sent */
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.pop-in { animation: pop-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) { .pop-in { animation: none; } }
