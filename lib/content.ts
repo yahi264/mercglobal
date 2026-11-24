@@ -8,10 +8,12 @@ export const company = {
   phoneDisplay: "+90 312 230 31 82 – 85",
   phoneHref: "tel:+903122303182",
   mobileDisplay: "+90 531 342 48 01",
+  // WhatsApp lines: one for candidates (job seekers), one for companies (staff requests); the last one is listed only
   whatsapp: [
-    { display: "+90 531 342 48 01", number: "905313424801" },
+    { display: "+90 533 445 68 06", number: "905334456806", for: "candidates" },
+    { display: "+90 531 342 48 01", number: "905313424801", for: "companies" },
     { display: "+90 545 792 02 68", number: "905457920268" },
-  ],
+  ] as { display: string; number: string; for?: "candidates" | "companies" }[],
   emails: ["info@turkishmanpower.com", "ali@turkishmanpower.com", "umut@turkishmanpower.com", "cv@turkishmanpower.com", "merc_ltd@hotmail.com"],
   emergencyEmail: "merc_ltd@hotmail.com",
   linkedin: "https://www.linkedin.com/company/merc-recruitment-services-ltd/",
@@ -31,7 +33,9 @@ export const company = {
   licenceDate: "22/09/2011",
 };
 
-export const mainWhatsApp = company.whatsapp[0].number;
+export const waCandidates = company.whatsapp.find((w) => w.for === "candidates")!;
+export const waCompanies = company.whatsapp.find((w) => w.for === "companies")!;
+export const mainWhatsApp = waCompanies.number;
 
 // ─── Home / about texts ──────────────────────────────────────────────────────
 export const text = {

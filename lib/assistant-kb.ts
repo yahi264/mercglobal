@@ -13,14 +13,14 @@ export function buildKb(l: Locale): Kb {
   const reg = regions.map((r) => ({ title: r.title[l], text: r.text[l], href: href(l, "countries") }));
   return {
     p: PHRASES[l],
-    whatsapp: company.whatsapp[0].number,
+    whatsapp: company.whatsapp[0].number, // candidates line
     services: svc,
     sectors: sec,
     regions: reg,
     contact: {
       lines: [
         { label: t("phone"), value: company.phoneDisplay, href: company.phoneHref },
-        ...company.whatsapp.map((w) => ({ label: "WhatsApp", value: w.display, href: `https://wa.me/${w.number}` })),
+        ...company.whatsapp.map((w) => ({ label: w.for ? `WhatsApp · ${t(w.for === "candidates" ? "waCandidates" : "waCompanies")}` : "WhatsApp", value: w.display, href: `https://wa.me/${w.number}` })),
         ...company.emails.slice(0, 2).map((e) => ({ label: t("email"), value: e, href: `mailto:${e}` })),
         { label: t("address"), value: company.addressLines.join(", "), href: company.mapLink },
       ],

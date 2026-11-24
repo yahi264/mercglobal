@@ -51,7 +51,10 @@ export default async function Contact({ params }: P) {
             <div>
               <p className="mb-1 text-sm text-muted">WhatsApp</p>
               {company.whatsapp.map((w) => (
-                <a key={w.number} href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className={link} dir="ltr">{w.display}</a>
+                <a key={w.number} href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className={`${link} flex flex-wrap items-center gap-x-2`}>
+                  <span dir="ltr">{w.display}</span>
+                  {w.for && <span className="rounded-full bg-whatsapp/15 px-2 py-0.5 text-[11px] font-bold text-[#128c7e] dark:text-whatsapp">{t(w.for === "candidates" ? "waCandidates" : "waCompanies")}</span>}
+                </a>
               ))}
             </div>
           </Reveal>
@@ -88,7 +91,7 @@ export default async function Contact({ params }: P) {
             <ContactForm
               subject={`${t("fSubject")} — Merç Global`}
               email={company.emails[0]}
-              whatsapp={company.whatsapp[0].number}
+              whatsapp={company.whatsapp[1].number}
               labels={{ whatsapp: t("fSendWhatsApp"), email: t("fSendEmail"), required: t("fRequired"), badEmail: t("fBadEmail"), opened: t("fOpened"), select: t("fSelect") }}
               fields={[
                 { name: "company", label: t("fCompany"), required: true, autoComplete: "organization" },

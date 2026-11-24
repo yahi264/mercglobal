@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/PageHero";
 import { CvBuilder } from "@/components/CvBuilder";
-import { company } from "@/lib/content";
+import { company, waCandidates } from "@/lib/content";
 import { getT, type Locale } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 
@@ -21,7 +21,7 @@ export default async function CvPage({ params }: P) {
         <CvBuilder
           defaultLang={l === "tr" ? "tr" : "en"}
           email={company.emails[0]}
-          whatsapp={company.whatsapp[0].number}
+          whatsapp={waCandidates.number}
           ui={{
             language: t("cvLanguage"),
             example: t("cvExample"),

@@ -90,7 +90,10 @@ export function Footer({ locale: l }: { locale: Locale }) {
             {company.whatsapp.map((w) => (
               <li key={w.number} className="flex gap-3">
                 <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-whatsapp" />
-                <a href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className={link} dir="ltr">{w.display}</a>
+                <a href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className={link}>
+                  <span dir="ltr">{w.display}</span>
+                  {w.for && <span className="ms-2 text-xs font-semibold text-whatsapp">· {t(w.for === "candidates" ? "waCandidates" : "waCompanies")}</span>}
+                </a>
               </li>
             ))}
             {company.emails.map((e) => (

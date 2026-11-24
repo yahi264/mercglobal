@@ -5,7 +5,7 @@ import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { ApplicationForm } from "@/components/ApplicationForm";
 import { CvLink } from "@/components/CvLink";
-import { company } from "@/lib/content";
+import { company, waCandidates } from "@/lib/content";
 import { getT, type Locale } from "@/lib/i18n";
 import { href } from "@/lib/nav";
 import type { JobsFile } from "@/lib/jobs";
@@ -30,7 +30,7 @@ export default async function Careers({ params }: P) {
             initial={initial as JobsFile}
             cvHref={href(l, "cv")}
             email={company.emails[0]}
-            whatsapp={company.whatsapp[0].number}
+            whatsapp={waCandidates.number}
             labels={{
               title: t("apTitle"), intro: t("apIntro"), name: t("fName"), email: t("fEmail"), phone: t("fPhone"), country: t("apCountry"),
               nationality: t("apNationality"), position: t("apPosition"), general: t("apGeneral"), change: t("apChange"), message: t("fMessage"),

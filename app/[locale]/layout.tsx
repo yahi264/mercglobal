@@ -11,7 +11,7 @@ import { BackToTop, PageFade, ScrollProgress, SmoothScroll } from "@/components/
 import { Intro } from "@/components/Intro";
 import { CookieConsent } from "@/components/CookieConsent";
 import { introScript, themeScript } from "@/lib/head-scripts";
-import { company, mainWhatsApp, text } from "@/lib/content";
+import { company, text, waCandidates, waCompanies } from "@/lib/content";
 import { dirOf, getT, isLocale, locales, type Locale } from "@/lib/i18n";
 import { href, navItems } from "@/lib/nav";
 import { asset } from "@/lib/asset";
@@ -66,7 +66,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           items={navItems(l)}
           cta={{ href: href(l, "contact") + "#request", label: t("requestStaff") }}
           labels={{ menuOpen: t("menuOpen"), menuClose: t("menuClose"), language: t("language"), dark: t("darkMode"), light: t("lightMode"), home: t("navHome") }}
-          contact={{ phone: company.phoneDisplay, phoneHref: company.phoneHref, emails: company.topEmails, linkedin: company.linkedin, city: "Kızılay / Ankara", whatsapp: mainWhatsApp }}
+          contact={{ phone: company.phoneDisplay, phoneHref: company.phoneHref, emails: company.topEmails, linkedin: company.linkedin, city: "Kızılay / Ankara", wa: [{ number: waCandidates.number, display: waCandidates.display, label: t("waCandidates") }, { number: waCompanies.number, display: waCompanies.display, label: t("waCompanies") }] }}
         />
         <main>
           <PageFade>{children}</PageFade>
@@ -74,7 +74,10 @@ export default async function LocaleLayout({ children, params }: Props) {
         <Footer locale={l} />
         <Assistant kb={buildKb(l)} />
         <FloatingContact
-          whatsapp={company.whatsapp}
+          lines={[
+            { kind: "candidates", number: waCandidates.number, display: waCandidates.display, title: t("waCandidates"), sub: t("waCandidatesSub") },
+            { kind: "companies", number: waCompanies.number, display: waCompanies.display, title: t("waCompanies"), sub: t("waCompaniesSub") },
+          ]}
           phoneHref={company.phoneHref}
           labels={{ call: `${t("callNow")} · +90 312 230 31 82`, write: t("writeWhatsApp"), close: t("close") }}
           greeting={`Merç Global — ${t("getInfo")}`}

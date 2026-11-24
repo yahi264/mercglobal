@@ -20,7 +20,7 @@ type Props = {
   items: NavItem[];
   cta: NavLink;
   labels: { menuOpen: string; menuClose: string; language: string; dark: string; light: string; home: string };
-  contact: { phone: string; phoneHref: string; emails: string[]; city: string; whatsapp: string; linkedin: string };
+  contact: { phone: string; phoneHref: string; emails: string[]; city: string; wa: { number: string; display: string; label: string }[]; linkedin: string };
 };
 
 export function Header({ locale, items, cta, labels, contact }: Props) {
@@ -101,11 +101,11 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
       <div className="hidden bg-navy text-[13px] text-white/80 md:block">
         <div className="container-x flex h-10 items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <a href={contact.phoneHref} className="flex items-center gap-2 transition-colors hover:text-white">
+            <a href={contact.phoneHref} className="flex items-center gap-2 whitespace-nowrap transition-colors hover:text-white">
               <Phone className="h-3.5 w-3.5 text-brand" /> <span dir="ltr">{contact.phone}</span>
             </a>
             {contact.emails.map((e, i) => (
-              <a key={e} href={`mailto:${e}`} className={`${i ? "hidden lg:flex" : "flex"} items-center gap-2 transition-colors hover:text-white`}>
+              <a key={e} href={`mailto:${e}`} className={`${i ? "hidden xl:flex" : "flex"} items-center gap-2 whitespace-nowrap transition-colors hover:text-white`}>
                 <Mail className="h-3.5 w-3.5 text-brand" /> {e}
               </a>
             ))}
@@ -113,19 +113,24 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
               <MapPin className="h-3.5 w-3.5 text-brand" /> {contact.city}
             </span>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 xl:gap-4">
             <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors hover:text-white" aria-label="LinkedIn">
-              <LinkedInIcon className="h-3.5 w-3.5 text-[#4c9be8]" /> LinkedIn
+              <LinkedInIcon className="h-3.5 w-3.5 text-[#4c9be8]" /> <span className="hidden xl:inline">LinkedIn</span>
             </a>
-            <a
-              href={`https://wa.me/${contact.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 transition-colors hover:text-white"
-              aria-label="WhatsApp"
-            >
-              <WhatsAppIcon className="h-4 w-4 text-whatsapp" /> WhatsApp
-            </a>
+            {/* one WhatsApp line for candidates, one for companies */}
+            {contact.wa.map((w) => (
+              <a
+                key={w.number}
+                href={`https://wa.me/${w.number}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-whatsapp/30 bg-whatsapp/10 px-2.5 py-0.5 text-[12px] font-semibold text-white/90 transition-colors hover:border-whatsapp hover:bg-whatsapp/20 hover:text-white"
+                title={`WhatsApp · ${w.label} · ${w.display}`}
+              >
+                <WhatsAppIcon className="h-3.5 w-3.5 text-whatsapp" /> {w.label}
+                <span className="hidden text-white/60 xl:inline" dir="ltr">{w.display}</span>
+              </a>
+            ))}
           </div>
         </div>
       </div>
@@ -301,11 +306,14 @@ export function Header({ locale, items, cta, labels, contact }: Props) {
                 </div>
                 <LanguageRow locale={locale} onPick={() => setOpen(false)} />
                 <div className="grid grid-cols-2 gap-2">
-                  <a href={contact.phoneHref} className="btn-outline whitespace-nowrap !px-2 !text-[13px]">
+                  {contact.wa.map((w) => (
+                    <a key={w.number} href={`https://wa.me/${w.number}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-0.5 rounded-2xl bg-whatsapp px-2 py-2.5 text-center text-white shadow-lg shadow-whatsapp/25 transition-transform hover:-translate-y-0.5">
+                      <span className="flex items-center gap-1.5 text-[13px] font-bold"><WhatsAppIcon className="h-4 w-4" /> {w.label}</span>
+                      <span className="text-[11px] font-semibold text-white/90" dir="ltr">{w.display}</span>
+                    </a>
+                  ))}
+                  <a href={contact.phoneHref} className="btn-outline col-span-2 whitespace-nowrap !py-2 !text-[13px]">
                     <Phone className="h-4 w-4" /> <span dir="ltr">+90 312 230 31 82</span>
-                  </a>
-                  <a href={`https://wa.me/${contact.whatsapp}`} target="_blank" rel="noopener noreferrer" className="btn-wa whitespace-nowrap !px-2 !text-[13px]">
-                    <WhatsAppIcon className="h-4 w-4" /> WhatsApp
                   </a>
                 </div>
                 <Link href={cta.href} className="btn-brand w-full">
