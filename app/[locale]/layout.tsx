@@ -78,6 +78,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             { kind: "candidates", number: waCandidates.number, display: waCandidates.display, title: t("waCandidates"), sub: t("waCandidatesSub") },
             { kind: "companies", number: waCompanies.number, display: waCompanies.display, title: t("waCompanies"), sub: t("waCompaniesSub") },
           ]}
+          others={company.whatsapp.filter((w) => !w.for)}
           phoneHref={company.phoneHref}
           labels={{ call: `${t("callNow")} · +90 312 230 31 82`, write: t("writeWhatsApp"), close: t("close") }}
           greeting={`Merç Global — ${t("getInfo")}`}

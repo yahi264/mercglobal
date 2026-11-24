@@ -25,7 +25,7 @@ export function Footer({ locale: l }: { locale: Locale }) {
             <img src={asset("/img/logo2.png")} alt="İŞKUR" width={56} height={56} className="h-14 w-14 rounded-full bg-white p-1" loading="lazy" />
           </div>
           <p className="max-w-4xl leading-relaxed">
-            {text.licence[l]} <span className="text-white">{t("cFree")}</span>
+            {text.licence[l]}
           </p>
         </div>
       </div>

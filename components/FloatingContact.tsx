@@ -9,6 +9,7 @@ export type WaLine = { number: string; display: string; title: string; sub: stri
 
 type Props = {
   lines: WaLine[];
+  others?: { number: string; display: string }[]; // other WhatsApp numbers, shown small at the bottom
   phoneHref: string;
   labels: { call: string; write: string; close: string };
   greeting: string;
@@ -16,7 +17,7 @@ type Props = {
 
 // Floating WhatsApp button (bottom corner). It opens a panel with one card for candidates and one for
 // companies, each going to its own WhatsApp line, plus the office phone.
-export function FloatingContact({ lines, phoneHref, labels, greeting }: Props) {
+export function FloatingContact({ lines, others = [], phoneHref, labels, greeting }: Props) {
   const [open, setOpen] = useState(false);
   return (
     <div className="fixed bottom-5 end-5 z-40 flex flex-col items-end gap-3">
@@ -70,6 +71,20 @@ export function FloatingContact({ lines, phoneHref, labels, greeting }: Props) {
                 </span>
                 {labels.call}
               </a>
+              {others.map((w) => (
+                <a
+                  key={w.number}
+                  href={`https://wa.me/${w.number}?text=${encodeURIComponent(greeting)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-semibold text-fg transition-colors hover:bg-page-2"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-whatsapp text-white">
+                    <WhatsAppIcon className="h-4 w-4" />
+                  </span>
+                  <span dir="ltr">{w.display}</span>
+                </a>
+              ))}
             </div>
           </motion.div>
         )}

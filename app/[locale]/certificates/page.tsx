@@ -26,7 +26,7 @@ export default async function Certificates({ params }: P) {
             <h2 className="mb-5 text-2xl font-extrabold text-fg sm:text-3xl">{legal.compTitle[l]}</h2>
             <p className="leading-relaxed text-muted">{legal.outro[l]}</p>
             <p className="mt-6 rounded-2xl border-s-4 border-brand bg-brand-soft p-5 text-sm leading-relaxed text-fg">
-              {text.licence[l]} {t("cFree")}
+              {text.licence[l]}
             </p>
           </Reveal>
           <Reveal delay={0.1}>

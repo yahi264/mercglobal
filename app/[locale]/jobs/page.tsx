@@ -72,7 +72,6 @@ export default async function Jobs({ params }: P) {
             createApply: t("jobCreateApply"),
           }}
         />
-        <p className="mt-10 text-center text-sm font-semibold text-muted">{t("cFree")}</p>
       </section>
     </>
   );

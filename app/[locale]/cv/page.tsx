@@ -51,7 +51,6 @@ export default async function CvPage({ params }: P) {
             jobsHref: href(l, "jobs"),
           }}
         />
-        <p className="mt-10 text-center text-sm font-semibold text-muted">{t("cFree")}</p>
       </section>
     </>
   );
