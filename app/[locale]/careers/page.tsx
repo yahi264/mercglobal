@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Briefcase, FileText, UploadCloud } from "lucide-react";
+import { Briefcase, FileText, ShieldCheck, UploadCloud } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { ApplicationForm } from "@/components/ApplicationForm";
@@ -42,6 +42,10 @@ export default async function Careers({ params }: P) {
           />
         </Reveal>
         <Reveal delay={0.1} className="space-y-5 lg:sticky lg:top-28 lg:self-start">
+          <div className="rounded-2xl border-s-4 border-brand bg-brand-soft p-6">
+            <ShieldCheck className="mb-3 h-8 w-8 text-brand" strokeWidth={1.5} />
+            <p className="font-bold leading-relaxed text-fg">{t("cFree")}</p>
+          </div>
           <div className="card space-y-3 p-6">
             <Link href={href(l, "jobs")} className="btn-brand glow-btn w-full">
               <Briefcase className="h-4 w-4" /> {t("navJobs")}
