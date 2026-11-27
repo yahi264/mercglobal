@@ -131,6 +131,13 @@ function ensureTab(ss, name, headers, init) {
   return sh;
 }
 
+// Text that starts with = + - or @ (e.g. "- requirement") would be read by Google Sheets as a formula
+// and stored as #ERROR!. A leading apostrophe makes Sheets keep it as plain text (it is not part of the value).
+function asText(v) {
+  var s = v == null ? "" : String(v);
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
 function cell(v) {
   if (v instanceof Date) return Utilities.formatDate(v, CONFIG.timezone, "yyyy-MM-dd");
   return v == null ? "" : String(v);
@@ -164,7 +171,7 @@ function saveJob(job) {
   var values = JOB_COLS.map(function (k) {
     if (k === "active") return job.active ? "true" : "false";
     if (k === "recipients") return cleanRecipients(job.recipients || []).join(",");
-    return job[k] == null ? "" : String(job[k]);
+    return asText(job[k]);
   });
   for (var r = 1; r < rows.length; r++) {
     if (String(rows[r][0]) === String(job.id)) {
@@ -340,11 +347,11 @@ function saveUser(oldUsername, username, password, note) {
   }
   if (row < 0) {
     if (!password) return { ok: false, error: "A password is required for a new user." };
-    sh.appendRow([username, "", note || ""]);
+    sh.appendRow([username, "", asText(note || "")]);
     row = sh.getLastRow();
   }
   sh.getRange(row, 1).setValue(username);
-  if (note != null) sh.getRange(row, 3).setValue(note);
+  if (note != null) sh.getRange(row, 3).setValue(asText(note));
   if (password) {
     var salt = Utilities.getUuid();
     sh.getRange(row, 2).setValue("sha256$" + salt + "$" + hashPw(salt, String(password)));
@@ -406,7 +413,7 @@ function apply(d) {
   } catch (err) {}
 
   try {
-    book().getSheetByName("Applications").appendRow([when, ref, role, d.name, d.email, d.phone || "", d.country || "", to.join(", "), d.cv ? "Created on the website" : d.file ? d.file.name : "—"]);
+    book().getSheetByName("Applications").appendRow([when, ref, role, d.name, d.email, d.phone || "", d.country || "", to.join(", "), d.cv ? "Created on the website" : d.file ? d.file.name : "—"].map(asText));
   } catch (err) {}
 
   return { ok: true, ref: ref };
