@@ -1,0 +1,34 @@
+1:"$Sreact.fragment"
+2:"/mercglobal/_next/static/chunks/1ua2kfq9s-me6.js"
+3:I[39756,["$2"],"default"]
+4:I[37457,["$2"],"default"]
+b:"/mercglobal/_next/static/chunks/3t1556byh67hu.js"
+c:"/mercglobal/_next/static/chunks/40crkge-z1ob8.js"
+d:"/mercglobal/_next/static/chunks/0-mkfsc0n3w8r.js"
+e:"/mercglobal/_next/static/chunks/3a7w0fnb5j7t3.js"
+f:I[23091,["$b","$c","$d","$e"],"Logo"]
+10:I[22016,["$b","$c","$d","$e"],""]
+11:I[95154,["$b","$c","$d","$e"],"AdminJobs"]
+12:I[97367,["$2"],"OutletBoundary"]
+13:"$Sreact.suspense"
+16:"ViewportBoundary"
+17:I[97367,["$2"],"$16"]
+18:"MetadataBoundary"
+19:I[97367,["$2"],"$18"]
+:HL["/mercglobal/_next/static/chunks/3qnr_zdvw0z-w.css","style"]
+:HL["/mercglobal/_next/static/chunks/0egftnakmm-ja.css","style"]
+6:X
+6:C
+7:X
+a:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","main",null,{"className":"container-x py-10","children":[["$","header",null,{"className":"mb-8 flex flex-wrap items-center justify-between gap-4","children":[["$","div",null,{"className":"min-w-0 max-w-full flex-1","children":["$","$Lf",null,{"locale":"tr","fit":true,"className":"[--lh:40px]"}]}],["$","div",null,{"className":"sm:text-end","children":[["$","h1",null,{"className":"text-2xl font-extrabold text-fg","children":"Job vacancies · İş ilanları"}],["$","$L10",null,{"href":"/en/jobs/","className":"text-sm font-semibold text-brand","children":"View on the website · Sitede gör →"}]]}]]}],["$","$L11",null,{"sectors":[{"slug":"oil-gas","title":"Oil & Natural Gas · Petrol & Doğal Gaz"},{"slug":"energy-power","title":"Energy & Power · Enerji ve Güç"},{"slug":"construction-infrastructure","title":"Construction & Infrastructure · İnşaat ve Altyapı"},{"slug":"offshore-marine-dredging","title":"Offshore, Marine & Dredging · Offshore, Marine ve Dredging"},{"slug":"agriculture-livestock","title":"Agriculture & Livestock · Tarım ve Hayvancılık"},{"slug":"logistics-transport","title":"Logistics & Transport · Lojistik ve Taşımacılık"},{"slug":"manufacturing-industry","title":"Manufacturing & Industry · İmalat ve Sanayi"},{"slug":"tourism-hospitality","title":"Tourism & Hospitality · Turizm ve Hizmet Sektörü"},{"slug":"aviation-defence","title":"Aviation & Defence Industry · Havacılık ve Savunma Sanayii"}]}]]}],[["$","script","script-0",{"src":"/mercglobal/_next/static/chunks/3t1556byh67hu.js","async":true}],["$","script","script-1",{"src":"/mercglobal/_next/static/chunks/40crkge-z1ob8.js","async":true}],["$","script","script-2",{"src":"/mercglobal/_next/static/chunks/0-mkfsc0n3w8r.js","async":true}],["$","script","script-3",{"src":"/mercglobal/_next/static/chunks/3a7w0fnb5j7t3.js","async":true}]],["$","$L12",null,{"children":["$","$13",null,{"name":"Next.MetadataOutlet","children":"$@14"}]}]]}],"p":"$@15","v":null,"s":"$7"}}]]
+8:[["children",{"s":"admin","h":112,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/mercglobal/_next/static/chunks/3qnr_zdvw0z-w.css","precedence":"next"}],["$","link","1",{"rel":"stylesheet","href":"/mercglobal/_next/static/chunks/0egftnakmm-ja.css","precedence":"next"}]],["$","html",null,{"lang":"en","className":"_1yDBpa_variable V0tXeq_variable","suppressHydrationWarning":true,"children":[["$","head",null,{"children":["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var t=localStorage.getItem(\"merc-theme\");if(!t){t=matchMedia(\"(prefers-color-scheme: dark)\").matches?\"dark\":\"light\"}if(t===\"dark\")document.documentElement.classList.add(\"dark\")}catch(e){}})();"}}]}],["$","body",null,{"className":"min-h-screen bg-page-2","children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]]}]]}],"p":"$@9","v":null,"s":"$7"},"c":"$Qa"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]]}],"p":"$@5","v":"$6","s":"$7"},"c":"$Q8"},"h":{"r":["$","$1","h",{"children":[null,["$","$L17",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L19",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$13",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Admin · Merc Global"}],["$","meta","1",{"name":"robots","content":"noindex, nofollow"}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@1a","v":null,"s":"$7"}},"a":"$@1b","u":"$@1c","b":"T3jvRrsJRWGsk2fuCqYO9"}
+14:null
+7:300
+1c:true
+7:C
+1b:0
+9:"$undefined"
+5:"$undefined"
+1a:"$undefined"
+15:"$undefined"
