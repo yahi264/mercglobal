@@ -195,9 +195,9 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
                   })}
               </dl>
               <h3 className="mb-2 mt-6 font-bold text-fg">{labels.description}</h3>
-              <p className="whitespace-pre-line leading-relaxed text-muted" lang={open.language}>
-                {open.description}
-              </p>
+              <div className="leading-relaxed text-muted" lang={open.language}>
+                <RichText text={open.description} />
+              </div>
               {open.requirements && (
                 <>
                   <h3 className="mb-2 mt-6 font-bold text-fg">{labels.requirements}</h3>
@@ -208,7 +208,7 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
                       .filter(Boolean)
                       .map((r) => (
                         <li key={r} className="flex gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" /> {r}
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" /> <span><Inline text={r} /></span>
                         </li>
                       ))}
                   </ul>
@@ -232,5 +232,47 @@ export function JobBoard({ locale, initial, sectors, labels, applyHref, cvHref }
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// Vacancy text formatting: a line written in CAPITALS is shown as a bold section title, a short label
+// before ":" (e.g. "Contract:") is bold, and **text** is bold. Everything else stays as typed.
+const isTitle = (line: string) => {
+  const letters = line.replace(/\([^)]*\)/g, "").replace(/[^\p{L}]/gu, ""); // text in brackets may be lower case
+  return letters.length >= 4 && letters === letters.toLocaleUpperCase() && letters !== letters.toLocaleLowerCase();
+};
+
+function Inline({ text }: { text: string }) {
+  const bullet = text.match(/^([•\-*]\s*)/)?.[1] ?? "";
+  let rest = text.slice(bullet.length);
+  let label = "";
+  const m = rest.match(/^([^:.!?]{2,40}):\s/);
+  if (m && !/^https?$/i.test(m[1])) {
+    label = m[1] + ":";
+    rest = rest.slice(m[0].length - 1);
+  }
+  const parts = rest.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {bullet}
+      {label && <strong className="font-bold text-fg">{label}</strong>}
+      {parts.map((p, i) => (p.startsWith("**") && p.endsWith("**") ? <strong key={i} className="font-bold text-fg">{p.slice(2, -2)}</strong> : p))}
+    </>
+  );
+}
+
+function RichText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/\n{2,}/).map((block, b) => (
+        <p key={b} className="mt-3 first:mt-0">
+          {block.split("\n").map((line, i) => (
+            <span key={i} className="block">
+              {isTitle(line) ? <strong className="mt-1 block font-extrabold tracking-wide text-fg">{line}</strong> : <Inline text={line} />}
+            </span>
+          ))}
+        </p>
+      ))}
+    </>
   );
 }
